@@ -1,9 +1,7 @@
 from telebot import TeleBot
 from movie_db_api import get_popular_movies
 
-TOKEN = '595208354:AAHKafsVTLRt2xYJDOeoNzhlADcXCI00UGA'
-
-bot = TeleBot(TOKEN)
+bot = TeleBot('TOKEN_HERE')
 
 
 @bot.message_handler(commands=['start', 'help'])
