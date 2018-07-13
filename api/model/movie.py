@@ -24,11 +24,16 @@ class Movie(object):
         self.overview = response_dict['overview']
         self.release_date = response_dict['release_date']
         self._poster_path = response_dict['poster_path']
+        self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']
 
     @property
     def poster_url(self):
         return Image.BASE_URL + Image.PosterSize.MEDIUM.value + self._poster_path
+
+    @property
+    def backdrop_url(self):
+        return Image.BASE_URL + Image.BackdropSize.MEDIUM.value + self._backdrop_path
 
     @property
     def release_year(self):
