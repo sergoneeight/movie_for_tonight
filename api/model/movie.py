@@ -1,4 +1,6 @@
 from api.model.base_multiple_response import BaseMultipleResponse
+from api.model.genres import Genre
+from api.model.image import Image
 
 
 class MoviesResponse(BaseMultipleResponse):
@@ -14,21 +16,24 @@ class MoviesResponse(BaseMultipleResponse):
 
 
 class Movie(object):
-    IMAGE_BASE_URL = 'http://image.tmdb.org/t/p/w500/'
-
     def __init__(self, response_dict):
         self.id = response_dict['id']
         self.title = response_dict['title']
         self.vote_average = response_dict['vote_average']
         self.vote_count = response_dict['vote_count']
         self.overview = response_dict['overview']
-        self._poster_path = response_dict['poster_path']
         self.release_date = response_dict['release_date']
+        self._poster_path = response_dict['poster_path']
+        self._genre_ids = response_dict['genre_ids']
 
     @property
     def poster_url(self):
-        return self.IMAGE_BASE_URL + self._poster_path
+        return Image.BASE_URL + Image.PosterSize.MEDIUM.value + self._poster_path
 
     @property
     def release_year(self):
         return self.release_date.split('-')[0]
+
+    @property
+    def genres(self):
+        return [Genre.title(genre_id) for genre_id in self._genre_ids]

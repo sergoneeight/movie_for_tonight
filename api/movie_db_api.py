@@ -4,7 +4,7 @@ import requests
 
 import misc
 from api.model.movie import MoviesResponse
-from api.model.tv_show import TvShowsResponse
+from api.model.tv_show import TVShowsResponse
 
 
 class MovieDbApi(object):
@@ -29,7 +29,7 @@ class MovieDbApi(object):
         endpoint = self._get_endpoint(self.METHOD.POPULAR_TV_SHOWS.value)
         http_response = requests.get(endpoint, verify=False)
         if http_response.status_code == 200:
-            return TvShowsResponse(http_response.json())
+            return TVShowsResponse(http_response.json())
         return None
 
     def get_movie(self, movie_id):
