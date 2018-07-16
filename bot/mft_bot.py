@@ -1,6 +1,16 @@
 from telebot import TeleBot
 
-bot = TeleBot('TOKEN_HERE')
+from api.movie_db_service import MovieDbService
+
+
+class MovieForTonightBot(TeleBot):
+    def __init__(self, token):
+        super().__init__(token)
+        self.movie_db_service = MovieDbService()
+        self.popular_movies_response = None
+
+
+bot = MovieForTonightBot('TOKEN_HERE')
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -10,7 +20,13 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['popular'])
 def send_popular_movies(message):
-    pass
+    __request_popular_movies()
+
+
+def __request_popular_movies():
+    response = bot.movie_db_service.get_popular_movies_response()
+    if response:
+        bot.popular_movies_response = response
 
 
 if __name__ == '__main__':
