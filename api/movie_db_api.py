@@ -22,14 +22,14 @@ class MovieDbApi(object):
         endpoint = self._get_endpoint(self.METHOD.POPULAR_MOVIES.value)
         http_response = requests.get(endpoint, verify=False)
         if http_response.status_code == 200:
-            return MoviesResponse(http_response.json())
+            return MoviesResponse(http_response.json()).get_movies()
         return None
 
     def get_popular_tv_shows(self):
         endpoint = self._get_endpoint(self.METHOD.POPULAR_TV_SHOWS.value)
         http_response = requests.get(endpoint, verify=False)
         if http_response.status_code == 200:
-            return TVShowsResponse(http_response.json())
+            return TVShowsResponse(http_response.json()).get_tv_shows()
         return None
 
     def get_movie(self, movie_id):

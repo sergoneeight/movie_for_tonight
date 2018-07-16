@@ -24,4 +24,8 @@ class Genre(Enum):
 
     @classmethod
     def title(cls, genre_id):
-        return Genre(genre_id).name.capitalize()
+        genre = Genre(genre_id).name
+        splitted = genre.split('_')
+        if len(splitted) == 2:
+            return splitted[0].capitalize() + ' ' + splitted[1].capitalize()
+        return genre.capitalize()

@@ -26,6 +26,17 @@ class Movie(object):
         self._poster_path = response_dict['poster_path']
         self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']
+        self._gold_star = '&#11088'
+
+    @property
+    def caption(self):
+        return u'<b>{title}</b> ({year})\n{genres}\n<b>{rating}</b> {star}'.format(
+            title=self.title,
+            year=self.release_year,
+            rating=self.vote_average,
+            star=self._gold_star,
+            genres=self.formatted_genres
+        )
 
     @property
     def poster_url(self):
@@ -42,3 +53,7 @@ class Movie(object):
     @property
     def genres(self):
         return [Genre.title(genre_id) for genre_id in self._genre_ids]
+
+    @property
+    def formatted_genres(self):
+        return ','.join(self.genres)
