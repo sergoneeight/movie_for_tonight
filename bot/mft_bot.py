@@ -32,28 +32,16 @@ def index():
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, "Howdy, how are you doing?")
+    bot.reply_to(message, text="""Welcome Stranger!
+This bot doеsn't do so much right now,
+but still you can ask him:
+_______________________________________________________________
+/mft - shows random movie""")
 
 
 @bot.message_handler(commands=['popular'])
 def send_popular_movies(message):
     __request_popular_movies()
-    # bot.popular_movies = api.get_popular_movies()
-    # movies_chunck = get_somth(bot.popular_movies)
-    # m = next(movies_chunck)
-    #
-    # for index, movie in enumerate(m):
-    #     click_kb = types.InlineKeyboardMarkup()
-    #     click_button = types.InlineKeyboardButton("More Info", callback_data='clicked', url=movie.details_url)
-    #     click_kb.row(click_button)
-    #     if index == len(m) - 1:
-    #         next_btn = types.InlineKeyboardButton("Next movies", callback_data='next_movies')
-    #         click_kb.row(next_btn)
-    #     bot.send_photo(chat_id=message.chat.id,
-    #                    photo=movie.poster_url,
-    #                    caption=movie.caption,
-    #                    parse_mode='HTML',
-    #                    reply_markup=click_kb)
 
 
 @bot.message_handler(commands=['mft'])
@@ -62,7 +50,9 @@ def send_random_movie(message):
     if movie:
         markup = types.InlineKeyboardMarkup()
         details_btn = types.InlineKeyboardButton(text='Details', url=movie.details_url)
+        new_movie_btn = types.InlineKeyboardButton(text='Try Again', callback_data='new_movie')
         markup.row(details_btn)
+        markup.row(new_movie_btn)
         bot.send_photo(message.chat.id, photo=movie.poster_url, caption=movie.caption, parse_mode='HTML',
                        reply_markup=markup)
 
@@ -73,11 +63,11 @@ def __request_popular_movies():
         bot.popular_movies_response = response
 
 
-@bot.callback_query_handler(func=lambda call: call.data == 'next_movies')
-def on_next_clicked(call):
-    bot.send_message(call.message.chat.id, 'On next clicked')
+@bot.callback_query_handler(func=lambda call: call.data == 'new_movie')
+def on_new_random_movie_clicked(call):
+    send_random_movie(call.message)
 
 
 if __name__ == '__main__':
-    app.run()
-    # bot.polling()
+    # app.run()
+    bot.polling()

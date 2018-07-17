@@ -62,4 +62,4 @@ class Movie(object):
 
     @property
     def formatted_genres(self):
-        return ','.join(self.genres)
+        return ', '.join(self.genres)
