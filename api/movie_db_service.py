@@ -46,7 +46,7 @@ class MovieDbService(object):
         endpoint = self.BASE_URL + 'discover/movie'
         payload = self.BASE_PAYLOAD.copy()
         payload.update(DiscoverMoviesFilter(page=random_page).filter)
-        http_response = requests.get(endpoint, params=payload, verify=False)
+        http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
             return MoviesResponse(http_response.json()).get_movies()[randint(1, 19)]
         return None
