@@ -23,6 +23,13 @@ def send_popular_movies(message):
     __request_popular_movies()
 
 
+@bot.message_handler(commands=['mft'])
+def send_random_movie(message):
+    movie = bot.movie_db_service.random_movie()
+    if movie:
+        bot.send_photo(message.chat.id, photo=movie.poster_url, caption=movie.caption)
+
+
 def __request_popular_movies():
     response = bot.movie_db_service.get_popular_movies_response()
     if response:

@@ -16,6 +16,8 @@ class MoviesResponse(BaseMultipleResponse):
 
 
 class Movie(object):
+    BASE_MOVIE_URL = 'https://www.themoviedb.org/movie/'
+
     def __init__(self, response_dict):
         self.id = response_dict['id']
         self.title = response_dict['title']
@@ -30,7 +32,7 @@ class Movie(object):
 
     @property
     def caption(self):
-        return u'<b>{title}</b> ({year})\n{genres}\n<b>{rating}</b> {star}'.format(
+        return u'<b>{title}</b>({year})\n{genres}\n<b>{rating}</b> {star}'.format(
             title=self.title,
             year=self.release_year,
             rating=self.vote_average,
@@ -45,6 +47,10 @@ class Movie(object):
     @property
     def backdrop_url(self):
         return Image.BASE_URL + Image.BackdropSize.MEDIUM.value + self._backdrop_path
+
+    @property
+    def details_url(self):
+        return self.BASE_MOVIE_URL + str(self.id)
 
     @property
     def release_year(self):

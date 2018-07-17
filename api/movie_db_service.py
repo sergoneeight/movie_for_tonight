@@ -1,6 +1,9 @@
+from random import randint
+
 import requests
 
 import misc
+from api.model.filter import DiscoverMoviesFilter
 from api.model.movie import MoviesResponse
 from api.model.tv_show import TVShowsResponse
 
@@ -26,7 +29,8 @@ class MovieDbService(object):
 
     def get_movies_in_theatres(self):
         endpoint = self.BASE_URL + 'movie/now_playing'
-        payload = self.BASE_PAYLOAD.update({'region': 'US'})
+        payload = self.BASE_PAYLOAD.copy()
+        payload.update({'region': 'US'})
         http_response = requests.get(endpoint, params=payload, verify=False)
         pass
 
@@ -36,8 +40,16 @@ class MovieDbService(object):
     def get_tv_show(self, tv_show_id):
         pass
 
-    def random_movie(self, filer):
-        pass
+    def random_movie(self):
+        max_pages_for_random_choice = 100
+        random_page = randint(1, max_pages_for_random_choice)
+        endpoint = self.BASE_URL + 'discover/movie'
+        payload = self.BASE_PAYLOAD.copy()
+        payload.update(DiscoverMoviesFilter(page=random_page).filter)
+        http_response = requests.get(endpoint, params=payload, verify=False)
+        if http_response.status_code == 200:
+            return MoviesResponse(http_response.json()).get_movies()[randint(1, 19)]
+        return None
 
     def search_movies(self, query):
         pass
