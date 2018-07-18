@@ -42,7 +42,9 @@ class Movie(object):
 
     @property
     def poster_url(self):
-        return Image.BASE_URL + Image.PosterSize.MEDIUM.value + self._poster_path
+        if self._poster_path:
+            return Image.BASE_URL + Image.PosterSize.MEDIUM.value + self._poster_path
+        return Image.BASE_URL + Image.PosterSize.MEDIUM.value
 
     @property
     def backdrop_url(self):

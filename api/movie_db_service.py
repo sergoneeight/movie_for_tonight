@@ -20,6 +20,13 @@ class MovieDbService(object):
             return MoviesResponse(http_response.json())
         return None
 
+    def get_similar_movies(self, movie_id):
+        endpoint = self.BASE_URL + 'movie/{movie_id}/recommendations'.format(movie_id=movie_id)
+        http_response = requests.get(endpoint, params=self.BASE_PAYLOAD, verify=False)
+        if http_response.status_code == 200:
+            return MoviesResponse(http_response.json()).get_movies()
+        return None
+
     def get_popular_tv_shows(self):
         endpoint = self.BASE_URL + 'tv/popular'
         http_response = requests.get(endpoint, params=self.BASE_PAYLOAD, verify=False)
@@ -52,7 +59,13 @@ class MovieDbService(object):
         return None
 
     def search_movies(self, query):
-        pass
+        endpoint = self.BASE_URL + 'search/movie'
+        payload = self.BASE_PAYLOAD.copy()
+        payload.update({'query': str(query)})
+        http_response = requests.get(endpoint, params=payload, verify=False)
+        if http_response.status_code == 200:
+            return MoviesResponse(http_response.json()).get_movies()
+        return None
 
     def search_tv_shows(self, query):
         pass
