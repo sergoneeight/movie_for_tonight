@@ -28,7 +28,7 @@ class Movie(object):
         self._poster_path = response_dict['poster_path']
         self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']
-        self._gold_star = '&#11088'
+        self.gold_star = u'\u2B50'
 
     @property
     def caption(self):
@@ -36,9 +36,24 @@ class Movie(object):
             title=self.title,
             year=self.release_year,
             rating=self.vote_average,
-            star=self._gold_star,
+            star=self.gold_star,
             genres=self.formatted_genres
         )
+
+    @property
+    def description(self):
+        return u'{genres}\n{rating} {star}'.format(
+            genres=self.formatted_genres,
+            rating=self.vote_average,
+            star=self.gold_star)
+
+    @property
+    def description_with_url(self):
+        return '<a href="{url}">{movie_title} ({year})</a>'.format(
+            url=self.details_url, movie_title=self.title,
+            year=self.release_year) + '\n' + self.formatted_genres + '\n' + '<b>{rating}</b>{star}'.format(
+            rating=self.vote_average,
+            star=self.gold_star) + '\n\n'
 
     @property
     def poster_url(self):
@@ -47,8 +62,16 @@ class Movie(object):
         return Image.BASE_URL + Image.PosterSize.MEDIUM.value
 
     @property
+    def poster_thumb_url(self):
+        if self._poster_path:
+            return Image.BASE_URL + Image.PosterSize.XXSMALL.value + self._poster_path
+        return Image.BASE_URL + Image.PosterSize.MEDIUM.value
+
+    @property
     def backdrop_url(self):
-        return Image.BASE_URL + Image.BackdropSize.MEDIUM.value + self._backdrop_path
+        if self._backdrop_path:
+            return Image.BASE_URL + Image.BackdropSize.MEDIUM.value + self._backdrop_path
+        return Image.BASE_URL + Image.PosterSize.MEDIUM.value
 
     @property
     def details_url(self):
@@ -65,3 +88,7 @@ class Movie(object):
     @property
     def formatted_genres(self):
         return ', '.join(self.genres)
+
+    @property
+    def title_with_year(self):
+        return self.title + ' ({year})'.format(year=self.release_year)
