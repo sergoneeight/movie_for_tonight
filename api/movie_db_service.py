@@ -5,6 +5,7 @@ import requests
 import misc
 from api.model.filter import DiscoverMoviesFilter
 from api.model.movie import MoviesResponse
+from api.model.multi_search import MultiSearchResponse
 from api.model.tv_show import TVShowsResponse
 
 
@@ -47,7 +48,7 @@ class MovieDbService(object):
     def get_tv_show(self, tv_show_id):
         pass
 
-    def random_movie(self):
+    def get_random_movie(self):
         max_pages_for_random_choice = 100
         random_page = randint(1, max_pages_for_random_choice)
         endpoint = self.BASE_URL + 'discover/movie'
@@ -65,6 +66,15 @@ class MovieDbService(object):
         http_response = requests.get(endpoint, params=payload, verify=False)
         if http_response.status_code == 200:
             return MoviesResponse(http_response.json()).get_movies()
+        return None
+
+    def multi_search(self, query):
+        endpoint = self.BASE_URL + 'search/multi'
+        payload = self.BASE_PAYLOAD.copy()
+        payload.update({'query': str(query)})
+        http_response = requests.get(endpoint, params=payload, verify=False)
+        if http_response.status_code == 200:
+            return MultiSearchResponse(http_response.json()).get_search_items()
         return None
 
     def search_tv_shows(self, query):

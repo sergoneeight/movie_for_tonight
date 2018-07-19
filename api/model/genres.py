@@ -21,6 +21,14 @@ class Genre(Enum):
     THRILLER = 53
     WAR = 10752
     WESTERN = 37
+    ACTION_AND_ADVENTURE = 10759
+    KIDS = 10762
+    NEWS = 10763
+    REALITY = 10764
+    SCIFI_AND_FANTASY = 10765
+    SOAP = 10766
+    TALK = 10767
+    WAR_AND_POLITICS = 10768
 
     @classmethod
     def title(cls, genre_id):
@@ -28,4 +36,6 @@ class Genre(Enum):
         splitted = genre.split('_')
         if len(splitted) == 2:
             return splitted[0].capitalize() + ' ' + splitted[1].capitalize()
+        if len(splitted) == 3:
+            return splitted[0].capitalize() + ' & ' + splitted[2].capitalize()
         return genre.capitalize()

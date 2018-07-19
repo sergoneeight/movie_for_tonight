@@ -17,6 +17,7 @@ class MoviesResponse(BaseMultipleResponse):
 
 class Movie(object):
     BASE_MOVIE_URL = 'https://www.themoviedb.org/movie/'
+    POSTER_PLACEHOLDER = 'https://critics.io/img/movies/poster-placeholder.png'
 
     def __init__(self, response_dict):
         self.id = response_dict['id']
@@ -59,13 +60,13 @@ class Movie(object):
     def poster_url(self):
         if self._poster_path:
             return Image.BASE_URL + Image.PosterSize.MEDIUM.value + self._poster_path
-        return Image.BASE_URL + Image.PosterSize.MEDIUM.value
+        return self.POSTER_PLACEHOLDER
 
     @property
     def poster_thumb_url(self):
         if self._poster_path:
-            return Image.BASE_URL + Image.PosterSize.XXSMALL.value + self._poster_path
-        return Image.BASE_URL + Image.PosterSize.MEDIUM.value
+            return Image.BASE_URL + Image.PosterSize.SMALL.value + self._poster_path
+        return self.POSTER_PLACEHOLDER
 
     @property
     def backdrop_url(self):
