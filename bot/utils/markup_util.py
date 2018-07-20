@@ -14,10 +14,20 @@ def get_random_movie_markup(movie):
     return markup
 
 
-def get_carousel_item_markup():
+def get_carousel_item_markup(item, current_index, total_items):
+    indicator = '{current}|{total}'.format(current=current_index, total=total_items)
     markup = InlineKeyboardMarkup()
+    details_btn = InlineKeyboardButton(text='DETAILS', url=item.details_url)
+    similar_movies_btn = InlineKeyboardButton(
+        text='MORE LIKE THAT',
+        callback_data='similar_movies_for={movie_id}'.format(movie_id=item.id)
+    )
     next_btn = InlineKeyboardButton(text=u'NEXT', callback_data='next_item')
-    markup.row(next_btn)
+    previous_btn = InlineKeyboardButton(text=u'PREVIOUS', callback_data='previous_item')
+    current_page_indicator = InlineKeyboardButton(text=indicator, callback_data='one')
+    markup.row(previous_btn, current_page_indicator, next_btn)
+    markup.row(details_btn)
+    markup.row(similar_movies_btn)
     return markup
 
 

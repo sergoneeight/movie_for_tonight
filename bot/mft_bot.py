@@ -4,12 +4,14 @@ from telebot import types, TeleBot
 
 import misc
 from api.movie_db_service import MovieDbService
+from bot.carousel import Carousel
 from bot.utils import markup_util, inline_query_util
 
 bot = TeleBot(misc.BOT_TOKEN, threaded=False)
 app = flask.Flask(__name__)
 sslify = SSLify(app)
 movie_db_service = MovieDbService()
+popular_movies_carousel = Carousel()
 popular_movies = None
 
 # constants
@@ -44,15 +46,17 @@ def send_random_movie(message):
 
 @bot.message_handler(commands=['popular'])
 def send_popular_movies(message):
-    pass
-    # global popular_movies
-    # popular_movies = movie_db_service.get_popular_movies()
-    # bot.send_message(
-    #     chat_id=message.chat.id,
-    #     text=popular_movies[0].caption2,
-    #     parse_mode='HTML',
-    #     reply_markup=markup_util.get_carousel_item_markup()
-    # )
+    movies = movie_db_service.get_popular_movies()
+    if movies:
+        popular_movies_carousel.set_items(movies)
+        movie = popular_movies_carousel.current_item
+        if movie:
+            bot.send_message(
+                chat_id=message.chat.id,
+                text='<b>Here is most popular movies:</b>\n\n' + movie.caption2,
+                parse_mode='HTML',
+                reply_markup=markup_util.get_carousel_item_markup(movie, popular_movies_carousel.current_index, popular_movies_carousel.total_items)
+            )
 
 
 def send_similar_movies(chat_id, movie_id):
@@ -107,16 +111,28 @@ def on_similar_movies_clicked(call):
     send_similar_movies(call.message.chat.id, movie_id)
 
 
-@bot.callback_query_handler(func=lambda call: 'next_item' in call.data)
-def on_next_carousel_item_clicked(call):
-    pass
-    # bot.edit_message_text(
-    #     chat_id=call.message.chat.id,
-    #     message_id=call.message.message_id,
-    #     text=popular_movies[1].caption2,
-    #     parse_mode='HTML',
-    #     reply_markup=markup_util.get_carousel_item_markup()
-    # )
+@bot.callback_query_handler(func=lambda call: True)
+def on_next_previous_carousel_buttons_clicked(call):
+    if 'next_item' in call.data:
+        movie = popular_movies_carousel.next()
+        if movie:
+            bot.edit_message_text(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                text='<b>Here is most popular movies:</b>\n\n' + movie.caption2,
+                parse_mode='HTML',
+                reply_markup=markup_util.get_carousel_item_markup(movie, popular_movies_carousel.current_index, popular_movies_carousel.total_items)
+            )
+    elif 'previous_item' in call.data:
+        movie = popular_movies_carousel.previous()
+        if movie:
+            bot.edit_message_text(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                text='<b>Here is most popular movies:</b>\n\n' + movie.caption2,
+                parse_mode='HTML',
+                reply_markup=markup_util.get_carousel_item_markup(movie, popular_movies_carousel.current_index, popular_movies_carousel.total_items)
+            )
 
 
 @app.route('/', methods=['POST', 'GET'])
