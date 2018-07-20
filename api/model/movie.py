@@ -42,6 +42,16 @@ class Movie(object):
         )
 
     @property
+    def caption2(self):
+        return '<b>{title}</b> ({year})\n{genres}\n<b>{rating}</b> {star}<a href="{url}">&#160</a>'.format(
+            url=self.poster_url,
+            title=self.title,
+            year=self.release_year,
+            genres=self.formatted_genres,
+            rating=self.vote_average,
+            star=self.gold_star)
+
+    @property
     def description(self):
         return u'{genres}\n{rating} {star}'.format(
             genres=self.formatted_genres,

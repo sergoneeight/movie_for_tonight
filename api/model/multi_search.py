@@ -75,12 +75,13 @@ class MultiSearchItem(object):
     def caption(self):
         if self.media_type == self.MediaType.MOVIE.value or self.media_type == self.MediaType.TV_SHOW.value:
             caption = '<b>{title}</b>\n{genres}\n<b>{rating}</b> {star}<a href="{url}">&#160</a>'.format(
-                url=self.details_url,
+                url=self.poster_url,
                 title=self.title,
                 genres=self.__get_formatted_genres(),
                 rating=self._vote_average,
                 star=self.gold_star)
             return caption
+
         elif self.media_type == self.MediaType.PERSON.value:
             return '<b>{title}</b>\n{type}<a href="{url}">&#160</a>'.format(
                 title=self.title,

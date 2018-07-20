@@ -14,11 +14,11 @@ class MovieDbService(object):
     BASE_URL = 'https://api.themoviedb.org/3/'
     BASE_PAYLOAD = {'api_key': API_KEY, 'language': 'en-US'}
 
-    def get_popular_movies_response(self):
+    def get_popular_movies(self):
         endpoint = self.BASE_URL + 'movie/popular'
         http_response = requests.get(endpoint, params=self.BASE_PAYLOAD, verify=False)
         if http_response.status_code == 200:
-            return MoviesResponse(http_response.json())
+            return MoviesResponse(http_response.json()).get_movies()
         return None
 
     def get_similar_movies(self, movie_id):
