@@ -40,7 +40,9 @@ class MovieDbService(object):
         payload = self.BASE_PAYLOAD.copy()
         payload.update({'region': 'US'})
         http_response = requests.get(endpoint, params=payload, verify=False)
-        pass
+        if http_response.status_code == 200:
+            return MoviesResponse(http_response.json()).get_movies()
+        return None
 
     def get_movie(self, movie_id):
         pass

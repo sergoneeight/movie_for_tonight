@@ -69,7 +69,7 @@ class Movie(object):
     @property
     def poster_url(self):
         if self._poster_path:
-            return Image.BASE_URL + Image.PosterSize.MEDIUM.value + self._poster_path
+            return Image.BASE_URL + Image.PosterSize.LARGE.value + self._poster_path
         return self.POSTER_PLACEHOLDER
 
     @property

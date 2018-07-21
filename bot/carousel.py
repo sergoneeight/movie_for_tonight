@@ -1,6 +1,13 @@
 class Carousel(object):
+    """Control that scrolls through all items like carousel
+    if end is reached starts from the beginning"""
+
     def __init__(self):
         self.__items = []
+        self.__current_index = 0
+
+    def set_items(self, items):
+        self.__items = items
         self.__current_index = 0
 
     @property
@@ -19,28 +26,24 @@ class Carousel(object):
             print(e)
         return None
 
-    def set_items(self, items):
-        self.__items = items
-        self.__current_index = 0
-
     def next(self):
         try:
             current_item = self.__items[self.__current_index + 1]
             self.__current_index += 1
             return current_item
-        except IndexError as e:
+        except IndexError:
             self.__current_index = 0
-            print(e)
-        return None
+            print('End has been reached')
+            return self.current_item
 
     def previous(self):
         try:
             current_item = self.__items[self.__current_index - 1]
             self.__current_index -= 1
             if self.__current_index == -1:
-                self.__current_index = len(self.__items) - 1
+                # if it stars scrolling backwards change index to index of the last element of the list
+                self.__current_index = self.total_items - 1
             return current_item
-        except IndexError as e:
+        except IndexError:
             self.__current_index = 0
-            print(e)
         return None
