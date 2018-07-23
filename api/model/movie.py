@@ -31,18 +31,18 @@ class Movie(object):
         self._genre_ids = response_dict['genre_ids']
         self.gold_star = u'\u2B50'
 
-    @property
-    def caption(self):
-        return u'<b>{title}</b> ({year})\n{genres}\n<b>{rating}</b> {star}'.format(
-            title=self.title,
-            year=self.release_year,
-            rating=self.vote_average,
-            star=self.gold_star,
-            genres=self.formatted_genres
-        )
+    # @property
+    # def caption(self):
+    #     return u'<b>{title}</b> ({year})\n{genres}\n<b>{rating}</b> {star}'.format(
+    #         title=self.title,
+    #         year=self.release_year,
+    #         rating=self.vote_average,
+    #         star=self.gold_star,
+    #         genres=self.formatted_genres
+    #     )
 
     @property
-    def caption2(self):
+    def caption(self):
         return '<b>{title}</b> ({year})\n{genres}\n<b>{rating}</b> {star}<a href="{url}">&#160</a>'.format(
             url=self.poster_url,
             title=self.title,

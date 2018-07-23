@@ -21,8 +21,9 @@ def get_random_movie_markup(movie):
     return markup
 
 
-def get_carousel_item_markup(item, carousel, callback):
+def get_carousel_item_markup(item, callback, carousel=None):
     page_indicator = '{current}|{total}'.format(current=carousel.current_index + 1, total=carousel.total_items)
+    more_like_this_callback = '{callback}-{item_id}-{title}'.format(callback=callback, item_id=item.id)
     markup = InlineKeyboardMarkup()
     details_btn = InlineKeyboardButton(text=DETAILS_BTN_NAME, url=item.details_url)
     more_like_this_btn = InlineKeyboardButton(
