@@ -4,19 +4,13 @@ from telebot import types, TeleBot
 
 import misc
 from api.movie_db_service import MovieDbService
-from bot.callbacks import PopularMoviesCallback, TheaterMoviesCallback, PopularTVShowsCallback
-from bot.carousel import Carousel
+from bot.callbacks import SearchCallback, RandomMovieCallback
 from bot.utils import markup_util, inline_query_util
 
 bot = TeleBot(misc.BOT_TOKEN, threaded=False)
 app = flask.Flask(__name__)
 sslify = SSLify(app)
 movie_db_service = MovieDbService()
-popular_movies_carousel = Carousel()
-in_theaters_carousel = Carousel()
-popular_tv_shows_carousel = Carousel()
-# popular_movies = None
-# in_theaters_movies = None
 
 # constants
 MAX_SIMILAR_MOVIES_RESULTS = 10
@@ -48,68 +42,23 @@ def send_random_movie(message):
         )
 
 
-@bot.message_handler(commands=['popular'])
+@bot.message_handler(commands=['popular_movies'])
 def send_popular_movies(message):
     movies = movie_db_service.get_popular_movies()
-    if movies:
-        popular_movies_carousel.set_items(movies)
-        movie = popular_movies_carousel.current_item
-        if movie:
-            bot.send_message(
-                chat_id=message.chat.id,
-                text=movie.caption,
-                parse_mode='HTML',
-                reply_markup=markup_util.get_carousel_item_markup(
-                    item=movie,
-                    carousel=popular_movies_carousel,
-                    callback=PopularMoviesCallback
-                )
-            )
 
 
 @bot.message_handler(commands=['in_theaters'])
 def send_in_theaters_movies(message):
     movies = movie_db_service.get_movies_in_theatres()
-    if movies:
-        in_theaters_carousel.set_items(movies)
-        movie = in_theaters_carousel.current_item
-        if movie:
-            bot.send_message(
-                chat_id=message.chat.id,
-                text=movie.caption,
-                parse_mode='HTML',
-                reply_markup=markup_util.get_carousel_item_markup(
-                    item=movie,
-                    carousel=in_theaters_carousel,
-                    callback=TheaterMoviesCallback
-                )
-            )
 
 
 @bot.message_handler(commands=['popular_tv_shows'])
 def send_popular_tv_shows(message):
     tv_shows = movie_db_service.get_popular_tv_shows()
-    if tv_shows:
-        popular_tv_shows_carousel.set_items(tv_shows)
-        tv_show = popular_tv_shows_carousel.current_item
-        if tv_show:
-            bot.send_message(
-                chat_id=message.chat.id,
-                text=tv_show.caption,
-                parse_mode='HTML',
-                reply_markup=markup_util.get_carousel_item_markup(
-                    item=tv_show,
-                    carousel=popular_tv_shows_carousel,
-                    callback=PopularTVShowsCallback
-                )
-            )
 
 
 def send_more_like_this(chat_id, id, callback):
-    if PopularMoviesCallback.MORE_LIKE_THIS_BTN.value == callback:
-        pass
-    elif PopularTVShowsCallback.MORE_LIKE_THIS_BTN.value == callback:
-        pass
+    pass
     # movies = movie_db_service.get_similar_movies(movie_id)
     # if movies and len(movies) > 0:
     #     msg = ''
@@ -121,100 +70,58 @@ def send_more_like_this(chat_id, id, callback):
     #     bot.send_message(chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
 
 
-@bot.message_handler(commands=["search"])
+@bot.message_handler(commands=['search'])
 def go_to_inline_search(message):
-    bot.send_message(message.chat.id, "Click the button to start search for a movie, tv show, person",
+    bot.send_message(message.chat.id, 'Click the button to start search for a movie, tv show, person',
                      reply_markup=markup_util.get_inline_search_markup())
 
 
+@bot.message_handler(commands=['popular'])
+def go_to_inline_popular_results(message):
+    bot.send_message(message.chat.id, 'Select to see currently popular:',
+                     reply_markup=markup_util.get_inline_popular_markup())
+
+
 @bot.inline_handler(func=lambda query: True)
-def search_movies_query(query):
+def search_query(query):
     if len(query.query) == 0:
         bot.answer_inline_query(query.id, [], cache_time=0)
+
+    if SearchCallback.POPULAR_MOVIES.value == query.query:
+        movies = movie_db_service.get_popular_movies()
+        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(movies), cache_time=0)
+
+    elif SearchCallback.POPULAR_TV_SHOWS.value == query.query:
+        tv_shows = movie_db_service.get_popular_tv_shows()
+        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(tv_shows), cache_time=0)
+
+    elif SearchCallback.POPULAR_PEOPLE.value == query.query:
+        people = movie_db_service.get_popular_people()
+        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(people), cache_time=0)
+
     else:
         search_results = movie_db_service.multi_search(query.query)
-        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(search_results),
-                                cache_time=10)
+        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(search_results), cache_time=0)
 
 
 # Markup button handlers
-@bot.callback_query_handler(func=lambda call: call.data == 'new_random_movie')
+@bot.callback_query_handler(func=lambda call: True)
 def on_retry_random_movie_clicked(call):
-    if call.message:
-        __update_random_movie(call.message)
+    if RandomMovieCallback.NEW_RANDOM_MOVIE.value == call.data:
+        if call.message:
+            update_random_movie(chat_id=call.message.chat.id, message_id=call.message.message_id)
 
 
-def __update_random_movie(message):
+def update_random_movie(chat_id=None, message_id=None, inline_message_id=None):
     movie = movie_db_service.get_random_movie()
     if movie:
         bot.edit_message_text(
             text=movie.caption,
-            chat_id=message.chat.id,
-            message_id=message.message_id,
+            chat_id=chat_id,
+            message_id=message_id,
+            inline_message_id=inline_message_id,
             parse_mode='HTML',
             reply_markup=markup_util.get_random_movie_markup(movie)
-        )
-
-
-# @bot.callback_query_handler(func=lambda call: True)
-# def on_more_like_this_button_clicked(call):
-#     pass
-# if PopularMoviesCallback.MORE_LIKE_THIS_BTN.value in call.data:
-#     movie_id = call.data.split('-')[1]
-#     movie_title = call.data.split('-')[2]
-# elif PopularTVShowsCallback.MORE_LIKE_THIS_BTN.value in call.data:
-#     tv_show_id = call.data.split('-')[1]
-#     tv_show_title = call.data.split('-')[2]
-# movie_id = call.data.split('=')[-1]
-# send_more_like_this_movie(call.message.chat.id, movie_id)
-
-
-@bot.callback_query_handler(func=lambda call: True)
-def on_next_previous_carousel_buttons_clicked(call):
-    if PopularMoviesCallback.NEXT_CAROUSEL_BTN.value in call.data:
-        movie = popular_movies_carousel.next()
-        __update_carousel(carousel=popular_movies_carousel, item=movie, call=call, callback=PopularMoviesCallback)
-
-    elif PopularMoviesCallback.PREVIOUS_CAROUSEL_BTN.value in call.data:
-        movie = popular_movies_carousel.previous()
-        __update_carousel(carousel=popular_movies_carousel, item=movie, call=call, callback=PopularMoviesCallback)
-
-    elif TheaterMoviesCallback.NEXT_CAROUSEL_BTN.value in call.data:
-        movie = in_theaters_carousel.next()
-        __update_carousel(carousel=in_theaters_carousel, item=movie, call=call, callback=TheaterMoviesCallback)
-
-    elif TheaterMoviesCallback.PREVIOUS_CAROUSEL_BTN.value in call.data:
-        movie = in_theaters_carousel.previous()
-        __update_carousel(carousel=in_theaters_carousel, item=movie, call=call, callback=TheaterMoviesCallback)
-
-    elif PopularTVShowsCallback.NEXT_CAROUSEL_BTN.value in call.data:
-        tv_show = popular_tv_shows_carousel.next()
-        __update_carousel(carousel=popular_tv_shows_carousel, item=tv_show, call=call, callback=PopularTVShowsCallback)
-
-    elif PopularTVShowsCallback.PREVIOUS_CAROUSEL_BTN.value in call.data:
-        tv_show = popular_tv_shows_carousel.previous()
-        __update_carousel(carousel=popular_tv_shows_carousel, item=tv_show, call=call, callback=PopularTVShowsCallback)
-
-    if PopularMoviesCallback.MORE_LIKE_THIS_BTN.value in call.data:
-        movies = movie_db_service.get_movie_recommendations()
-        send_more_like_this(call.message.chat.id, 12, '')
-
-    elif PopularTVShowsCallback.MORE_LIKE_THIS_BTN.value in call.data:
-        pass
-
-
-def __update_carousel(carousel, item, call, callback):
-    if item:
-        bot.edit_message_text(
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-            text=item.caption,
-            parse_mode='HTML',
-            reply_markup=markup_util.get_carousel_item_markup(
-                item=item,
-                carousel=carousel,
-                callback=callback
-            )
         )
 
 

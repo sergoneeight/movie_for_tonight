@@ -1,19 +1,11 @@
 from enum import Enum
 
 
-class PopularMoviesCallback(Enum):
-    NEXT_CAROUSEL_BTN = 'next_popular_movie'
-    PREVIOUS_CAROUSEL_BTN = 'previous_popular_movie'
-    MORE_LIKE_THIS_BTN = 'more_like_this_movie'
+class SearchCallback(Enum):
+    POPULAR_MOVIES = 'popular_movies'
+    POPULAR_TV_SHOWS = 'popular_tv_shows'
+    POPULAR_PEOPLE = 'popular_people'
 
 
-class TheaterMoviesCallback(Enum):
-    NEXT_CAROUSEL_BTN = 'next_theater_movie'
-    PREVIOUS_CAROUSEL_BTN = 'previous_theater_movie'
-    MORE_LIKE_THIS_BTN = 'more_like_this_movie'
-
-
-class PopularTVShowsCallback(Enum):
-    NEXT_CAROUSEL_BTN = 'next_popular_tv_show'
-    PREVIOUS_CAROUSEL_BTN = 'previous_popular_tv_show'
-    MORE_LIKE_THIS_BTN = 'more_like_this_tv_show'
+class RandomMovieCallback(Enum):
+    NEW_RANDOM_MOVIE = 'new_random_movie'

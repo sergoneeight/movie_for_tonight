@@ -21,7 +21,7 @@ class Movie(object):
 
     def __init__(self, response_dict):
         self.id = response_dict['id']
-        self.title = response_dict['title']
+        self._title = response_dict['title']
         self.vote_average = response_dict['vote_average']
         self.vote_count = response_dict['vote_count']
         self.overview = response_dict['overview']
@@ -30,16 +30,7 @@ class Movie(object):
         self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']
         self.gold_star = u'\u2B50'
-
-    # @property
-    # def caption(self):
-    #     return u'<b>{title}</b> ({year})\n{genres}\n<b>{rating}</b> {star}'.format(
-    #         title=self.title,
-    #         year=self.release_year,
-    #         rating=self.vote_average,
-    #         star=self.gold_star,
-    #         genres=self.formatted_genres
-    #     )
+        self.media_type = 'movie'
 
     @property
     def caption(self):
@@ -65,6 +56,10 @@ class Movie(object):
             year=self.release_year) + '\n' + self.formatted_genres + '\n' + '<b>{rating}</b>{star}'.format(
             rating=self.vote_average,
             star=self.gold_star) + '\n\n'
+
+    @property
+    def title(self):
+        return self._title + ' ({year})'.format(year=self.release_year)
 
     @property
     def poster_url(self):

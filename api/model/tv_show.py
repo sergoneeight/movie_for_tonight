@@ -20,7 +20,7 @@ class TVShow(object):
 
     def __init__(self, response_dict):
         self.id = response_dict['id']
-        self.title = response_dict['name']
+        self._title = response_dict['name']
         self.overview = response_dict['overview']
         self.vote_average = response_dict['vote_average']
         self.vote_count = response_dict['vote_count']
@@ -29,6 +29,14 @@ class TVShow(object):
         self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']
         self.gold_star = u'\u2B50'
+        self.media_type = 'tv'
+
+    @property
+    def description(self):
+        return u'{genres}\n{rating} {star}'.format(
+            genres=self.formatted_genres,
+            rating=self.vote_average,
+            star=self.gold_star)
 
     @property
     def caption(self):
@@ -39,6 +47,10 @@ class TVShow(object):
             genres=self.formatted_genres,
             rating=self.vote_average,
             star=self.gold_star)
+
+    @property
+    def title(self):
+        return self._title + ' ({year})'.format(year=self.release_year)
 
     @property
     def first_air_year(self):
@@ -55,6 +67,10 @@ class TVShow(object):
     @property
     def formatted_genres(self):
         return ', '.join(self.genres)
+
+    @property
+    def release_year(self):
+        return self.first_air_date.split('-')[0]
 
     @property
     def poster_url(self):
