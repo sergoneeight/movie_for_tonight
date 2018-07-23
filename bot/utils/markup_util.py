@@ -12,13 +12,16 @@ def get_random_movie_markup(movie):
     markup = InlineKeyboardMarkup()
     details_btn = InlineKeyboardButton(text=DETAILS_BTN_NAME, url=movie.details_url)
     retry_btn = InlineKeyboardButton(text=RETRY_BTN_NAME, callback_data='new_random_movie')
-    more_like_this_btn = InlineKeyboardButton(
-        text=MORE_LIKE_THIS_BTN_NAME,
-        callback_data='more_like={movie_id}'.format(movie_id=movie.id)
-    )
     markup.row(details_btn, retry_btn)
-    markup.row(more_like_this_btn)
+    markup.row(__more_like_this_btn(movie.id))
     return markup
+
+
+def __more_like_this_btn(item_id):
+    return InlineKeyboardButton(
+        text=MORE_LIKE_THIS_BTN_NAME,
+        callback_data='more_like={item_id}'.format(item_id=item_id)
+    )
 
 
 def get_carousel_item_markup(item, callback, carousel=None):
@@ -47,6 +50,14 @@ def get_inline_search_markup():
 
 
 def get_inline_search_result_markup(search_item):
+    markup = InlineKeyboardMarkup()
+    details_btn = InlineKeyboardButton(text=DETAILS_BTN_NAME, url=search_item.details_url)
+    markup.row(details_btn)
+    markup.row(__more_like_this_btn(search_item.id))
+    return markup
+
+
+def get_person_inline_search_result_markup(search_item):
     markup = InlineKeyboardMarkup()
     details_btn = InlineKeyboardButton(text=DETAILS_BTN_NAME, url=search_item.details_url)
     markup.row(details_btn)

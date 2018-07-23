@@ -93,6 +93,8 @@ class MultiSearchItem(object):
     @property
     def poster_url(self):
         if self._poster_path:
+            if self.media_type == self.MediaType.PERSON.value:
+                return Image.BASE_URL + Image.ProfileSize.LARGE.value + self._poster_path
             return Image.BASE_URL + Image.PosterSize.LARGE.value + self._poster_path
         return self.POSTER_PLACEHOLDER
 

@@ -12,11 +12,11 @@ bot = TeleBot(misc.BOT_TOKEN, threaded=False)
 app = flask.Flask(__name__)
 sslify = SSLify(app)
 movie_db_service = MovieDbService()
-popular_movies_carousel = Carousel()
-in_theaters_carousel = Carousel()
-popular_tv_shows_carousel = Carousel()
-# popular_movies = None
-# in_theaters_movies = None
+# Carousels
+popular_movies_carousel = Carousel(name='popular_movies')
+in_theaters_carousel = Carousel(name='in_theaters')
+popular_tv_shows_carousel = Carousel(name='popular_tv_shows')
+carousels = set()
 
 # constants
 MAX_SIMILAR_MOVIES_RESULTS = 10
@@ -51,6 +51,7 @@ def send_random_movie(message):
 @bot.message_handler(commands=['popular'])
 def send_popular_movies(message):
     movies = movie_db_service.get_popular_movies()
+    bot.send_media_group(message.chat.id, media=[], )
     if movies:
         popular_movies_carousel.set_items(movies)
         movie = popular_movies_carousel.current_item
@@ -106,10 +107,7 @@ def send_popular_tv_shows(message):
 
 
 def send_more_like_this(chat_id, id, callback):
-    if PopularMoviesCallback.MORE_LIKE_THIS_BTN.value == callback:
-        pass
-    elif PopularTVShowsCallback.MORE_LIKE_THIS_BTN.value == callback:
-        pass
+    pass
     # movies = movie_db_service.get_similar_movies(movie_id)
     # if movies and len(movies) > 0:
     #     msg = ''
@@ -141,16 +139,19 @@ def search_movies_query(query):
 @bot.callback_query_handler(func=lambda call: call.data == 'new_random_movie')
 def on_retry_random_movie_clicked(call):
     if call.message:
-        __update_random_movie(call.message)
+        update_random_movie(chat_id=call.message.chat.id, message_id=call.message.message_id)
+    elif call.inline_message_id:
+        update_random_movie(inline_message_id=call.inline_message_id)
 
 
-def __update_random_movie(message):
+def update_random_movie(chat_id=None, message_id=None, inline_message_id=None):
     movie = movie_db_service.get_random_movie()
     if movie:
         bot.edit_message_text(
             text=movie.caption,
-            chat_id=message.chat.id,
-            message_id=message.message_id,
+            chat_id=chat_id,
+            message_id=message_id,
+            inline_message_id=inline_message_id,
             parse_mode='HTML',
             reply_markup=markup_util.get_random_movie_markup(movie)
         )
@@ -187,20 +188,20 @@ def on_next_previous_carousel_buttons_clicked(call):
         movie = in_theaters_carousel.previous()
         __update_carousel(carousel=in_theaters_carousel, item=movie, call=call, callback=TheaterMoviesCallback)
 
-    elif PopularTVShowsCallback.NEXT_CAROUSEL_BTN.value in call.data:
-        tv_show = popular_tv_shows_carousel.next()
-        __update_carousel(carousel=popular_tv_shows_carousel, item=tv_show, call=call, callback=PopularTVShowsCallback)
+    # elif PopularTVShowsCallback.NEXT_CAROUSEL_BTN.value in call.data:
+    #     tv_show = popular_tv_shows_carousel.next()
+    #     __update_carousel(carousel=popular_tv_shows_carousel, item=tv_show, call=call, callback=PopularTVShowsCallback)
+    #
+    # elif PopularTVShowsCallback.PREVIOUS_CAROUSEL_BTN.value in call.data:
+    #     tv_show = popular_tv_shows_carousel.previous()
+    #     __update_carousel(carousel=popular_tv_shows_carousel, item=tv_show, call=call, callback=PopularTVShowsCallback)
 
-    elif PopularTVShowsCallback.PREVIOUS_CAROUSEL_BTN.value in call.data:
-        tv_show = popular_tv_shows_carousel.previous()
-        __update_carousel(carousel=popular_tv_shows_carousel, item=tv_show, call=call, callback=PopularTVShowsCallback)
-
-    if PopularMoviesCallback.MORE_LIKE_THIS_BTN.value in call.data:
-        movies = movie_db_service.get_movie_recommendations()
-        send_more_like_this(call.message.chat.id, 12, '')
-
-    elif PopularTVShowsCallback.MORE_LIKE_THIS_BTN.value in call.data:
-        pass
+    # if PopularMoviesCallback.MORE_LIKE_THIS_BTN.value in call.data:
+    #     movies = movie_db_service.get_movie_recommendations()
+    #     send_more_like_this(call.message.chat.id, 12, '')
+    #
+    # elif PopularTVShowsCallback.MORE_LIKE_THIS_BTN.value in call.data:
+    #     pass
 
 
 def __update_carousel(carousel, item, call, callback):

@@ -2,7 +2,8 @@ class Carousel(object):
     """Control that scrolls through all items like carousel
     if end is reached starts from the beginning"""
 
-    def __init__(self):
+    def __init__(self, name=None):
+        self.name = name
         self.__items = []
         self.__current_index = 0
 
