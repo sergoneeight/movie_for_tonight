@@ -3,31 +3,20 @@ from flask_sslify import SSLify
 from telebot import types, TeleBot
 
 import misc
+from api.model.multi_search import MultiSearchItem
 from api.movie_db_service import MovieDbService
-from bot.callbacks import SearchCallback, RandomMovieCallback
-from bot.utils import markup_util, inline_query_util
+from bot.callbacks import SearchCallback, RandomMovieCallback, GeneralCallback
+from bot.utils import markup_util, inline_query_util, messages
 
 bot = TeleBot(misc.BOT_TOKEN, threaded=False)
 app = flask.Flask(__name__)
 sslify = SSLify(app)
 movie_db_service = MovieDbService()
 
-# constants
-MAX_SIMILAR_MOVIES_RESULTS = 10
-TEXT_MESSAGES = {
-    'welcome':
-        u'Welcome Stranger!\n'
-        u'This bot cannot do much right now,\n'
-        u'but still you can ask him:\n'
-        u'________________________________________\n'
-        u'/random_movie - shows random movie\n'
-        u'/search - searches for a movie, tv show, person'
-}
-
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.send_message(message.chat.id, text=TEXT_MESSAGES['welcome'])
+    bot.send_message(message.chat.id, text=messages.WELCOME, parse_mode='HTML')
 
 
 @bot.message_handler(commands=['random_movie'])
@@ -42,44 +31,14 @@ def send_random_movie(message):
         )
 
 
-@bot.message_handler(commands=['popular_movies'])
-def send_popular_movies(message):
-    movies = movie_db_service.get_popular_movies()
-
-
-@bot.message_handler(commands=['in_theaters'])
-def send_in_theaters_movies(message):
-    movies = movie_db_service.get_movies_in_theatres()
-
-
-@bot.message_handler(commands=['popular_tv_shows'])
-def send_popular_tv_shows(message):
-    tv_shows = movie_db_service.get_popular_tv_shows()
-
-
-def send_more_like_this(chat_id, id, callback):
-    pass
-    # movies = movie_db_service.get_similar_movies(movie_id)
-    # if movies and len(movies) > 0:
-    #     msg = ''
-    #     for item_num, movie in enumerate(movies):
-    #         if item_num == MAX_SIMILAR_MOVIES_RESULTS:
-    #             break
-    #         msg += movie.description_with_url
-    #
-    #     bot.send_message(chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
-
-
 @bot.message_handler(commands=['search'])
 def go_to_inline_search(message):
-    bot.send_message(message.chat.id, 'Click the button to start search for a movie, tv show, person',
-                     reply_markup=markup_util.get_inline_search_markup())
+    bot.send_message(message.chat.id, messages.INLINE_SEARCH_PROMPT, reply_markup=markup_util.get_inline_search_markup())
 
 
 @bot.message_handler(commands=['popular'])
 def go_to_inline_popular_results(message):
-    bot.send_message(message.chat.id, 'Select to see currently popular:',
-                     reply_markup=markup_util.get_inline_popular_markup())
+    bot.send_message(message.chat.id, messages.POPULAR_PROMPT, reply_markup=markup_util.get_inline_popular_markup())
 
 
 @bot.inline_handler(func=lambda query: True)
@@ -87,21 +46,33 @@ def search_query(query):
     if len(query.query) == 0:
         bot.answer_inline_query(query.id, [], cache_time=0)
 
-    if SearchCallback.POPULAR_MOVIES.value == query.query:
+    elif SearchCallback.POPULAR_MOVIES.value == query.query:
         movies = movie_db_service.get_popular_movies()
-        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(movies), cache_time=0)
+        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(movies), cache_time=10)
 
     elif SearchCallback.POPULAR_TV_SHOWS.value == query.query:
         tv_shows = movie_db_service.get_popular_tv_shows()
-        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(tv_shows), cache_time=0)
+        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(tv_shows), cache_time=10)
 
     elif SearchCallback.POPULAR_PEOPLE.value == query.query:
         people = movie_db_service.get_popular_people()
-        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(people), cache_time=0)
+        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(people), cache_time=10)
+
+    elif GeneralCallback.MORE_LIKE_THIS.value in query.query:
+        query_data = query.query.split('-')
+        item_id = query_data[2]
+        media_type = query_data[1]
+
+        if MultiSearchItem.MediaType.TV_SHOW.value == media_type:
+            tv_shows = movie_db_service.get_tv_show_recommendations(item_id)
+            bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(tv_shows), cache_time=10)
+        else:
+            movies = movie_db_service.get_movie_recommendations(item_id)
+            bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(movies), cache_time=10)
 
     else:
         search_results = movie_db_service.multi_search(query.query)
-        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(search_results), cache_time=0)
+        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(search_results), cache_time=10)
 
 
 # Markup button handlers
@@ -138,5 +109,4 @@ def index():
 
 
 if __name__ == '__main__':
-    # app.run()
-    bot.polling()
+    app.run()

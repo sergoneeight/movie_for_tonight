@@ -34,7 +34,7 @@ class Movie(object):
 
     @property
     def caption(self):
-        return '<b>{title}</b> ({year})\n{genres}\n<b>{rating}</b> {star}<a href="{url}">&#160</a>'.format(
+        return '<b>{title}</b>\n{genres}\n<b>{rating}</b> {star}<a href="{url}">&#160</a>'.format(
             url=self.poster_url,
             title=self.title,
             year=self.release_year,

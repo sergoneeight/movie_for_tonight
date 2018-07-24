@@ -9,3 +9,7 @@ class SearchCallback(Enum):
 
 class RandomMovieCallback(Enum):
     NEW_RANDOM_MOVIE = 'new_random_movie'
+
+
+class GeneralCallback(Enum):
+    MORE_LIKE_THIS = 'more_like'
