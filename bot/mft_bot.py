@@ -43,20 +43,20 @@ def go_to_inline_popular_results(message):
 
 @bot.inline_handler(func=lambda query: True)
 def search_query(query):
+    offset = int(query.offset) if query.offset else 1
+    results = []
+
     if len(query.query) == 0:
         bot.answer_inline_query(query.id, [], cache_time=0)
 
     elif SearchCallback.POPULAR_MOVIES.value == query.query:
-        movies = movie_db_service.get_popular_movies()
-        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(movies), cache_time=10)
+        results = movie_db_service.get_popular_movies(page=offset)
 
     elif SearchCallback.POPULAR_TV_SHOWS.value == query.query:
-        tv_shows = movie_db_service.get_popular_tv_shows()
-        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(tv_shows), cache_time=10)
+        results = movie_db_service.get_popular_tv_shows(page=offset)
 
     elif SearchCallback.POPULAR_PEOPLE.value == query.query:
-        people = movie_db_service.get_popular_people()
-        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(people), cache_time=10)
+        results = movie_db_service.get_popular_people(page=offset)
 
     elif GeneralCallback.MORE_LIKE_THIS.value in query.query:
         query_data = query.query.split('-')
@@ -64,15 +64,20 @@ def search_query(query):
         media_type = query_data[1]
 
         if MultiSearchItem.MediaType.TV_SHOW.value == media_type:
-            tv_shows = movie_db_service.get_tv_show_recommendations(item_id)
-            bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(tv_shows), cache_time=10)
+            results = movie_db_service.get_tv_show_recommendations(tv_show_id=item_id, page=offset)
         else:
-            movies = movie_db_service.get_movie_recommendations(item_id)
-            bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(movies), cache_time=10)
-
+            results = movie_db_service.get_movie_recommendations(movie_id=item_id, page=offset)
     else:
-        search_results = movie_db_service.multi_search(query.query)
-        bot.answer_inline_query(query.id, results=inline_query_util.generate_inline_search_results(search_results), cache_time=10)
+        results = movie_db_service.multi_search(query=query.query, page=offset)
+
+    offset = offset + 1 if len(results) > 0 else ''
+    bot.answer_inline_query(
+        inline_query_id=query.id,
+        results=inline_query_util.generate_inline_search_results(results),
+        next_offset=offset,
+        cache_time=0,
+        is_personal=True
+    )
 
 
 # Markup button handlers
