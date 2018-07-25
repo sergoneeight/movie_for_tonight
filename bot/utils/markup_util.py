@@ -8,9 +8,10 @@ RETRY_BTN_NAME = u'RETRY'
 SEARCH_BTN_NAME = u'SEARCH'
 NEXT_BTN_NAME = u'NEXT'
 PREVIOUS_BTN_NAME = u'PREVIOUS'
-POPULAR_MOVIES_BTN_NAME = u'MOVIES'
-POPULAR_TV_SHOWS_BTN_NAME = u'TV SHOWS'
+MOVIES_BTN_NAME = u'MOVIES'
+TV_SHOWS_BTN_NAME = u'TV SHOWS'
 POPULAR_PEOPLE_BTN_NAME = u'PEOPLE'
+IN_THEATERS_BTN_NAME = u'IN THEATERS'
 
 
 def get_random_movie_markup(movie):
@@ -44,11 +45,11 @@ def get_inline_search_markup():
 def get_inline_popular_markup():
     markup = InlineKeyboardMarkup()
     popular_movies_btn = InlineKeyboardButton(
-        text=POPULAR_MOVIES_BTN_NAME,
+        text=MOVIES_BTN_NAME,
         switch_inline_query_current_chat=SearchCallback.POPULAR_MOVIES.value
     )
     popular_tv_shows_btn = InlineKeyboardButton(
-        text=POPULAR_TV_SHOWS_BTN_NAME,
+        text=TV_SHOWS_BTN_NAME,
         switch_inline_query_current_chat=SearchCallback.POPULAR_TV_SHOWS.value
     )
     popular_people_button = InlineKeyboardButton(
@@ -58,6 +59,31 @@ def get_inline_popular_markup():
     markup.add(popular_movies_btn)
     markup.add(popular_tv_shows_btn)
     markup.add(popular_people_button)
+    return markup
+
+
+def get_inline_top_rated_markup():
+    markup = InlineKeyboardMarkup()
+    top_rated_movies_btn = InlineKeyboardButton(
+        text=MOVIES_BTN_NAME,
+        switch_inline_query_current_chat=SearchCallback.TOP_RATED_MOVIES.value
+    )
+    popular_tv_shows_btn = InlineKeyboardButton(
+        text=TV_SHOWS_BTN_NAME,
+        switch_inline_query_current_chat=SearchCallback.TOP_RATED_TV_SHOWS.value
+    )
+    markup.add(top_rated_movies_btn)
+    markup.add(popular_tv_shows_btn)
+    return markup
+
+
+def get_inline_in_theaters_markup():
+    markup = InlineKeyboardMarkup()
+    in_theaters_btn = InlineKeyboardButton(
+        text=IN_THEATERS_BTN_NAME,
+        switch_inline_query_current_chat=SearchCallback.MOVIES_IN_THEATERS.value
+    )
+    markup.add(in_theaters_btn)
     return markup
 
 

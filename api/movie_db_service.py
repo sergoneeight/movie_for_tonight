@@ -24,8 +24,26 @@ class MovieDbService(object):
             return MoviesResponse(http_response.json()).get_movies()
         return None
 
+    def get_top_rated_movies(self, page=1):
+        endpoint = self.BASE_URL + 'movie/top_rated'
+        payload = self.BASE_PAYLOAD.copy()
+        payload.update({'page': str(page)})
+        http_response = requests.get(endpoint, params=payload)
+        if http_response.status_code == 200:
+            return MoviesResponse(http_response.json()).get_movies()
+        return None
+
     def get_popular_tv_shows(self, page=1):
         endpoint = self.BASE_URL + 'tv/popular'
+        payload = self.BASE_PAYLOAD.copy()
+        payload.update({'page': str(page)})
+        http_response = requests.get(endpoint, params=payload)
+        if http_response.status_code == 200:
+            return TVShowsResponse(http_response.json()).get_tv_shows()
+        return None
+
+    def get_top_rated_tv_shows(self, page=1):
+        endpoint = self.BASE_URL + 'tv/top_rated'
         payload = self.BASE_PAYLOAD.copy()
         payload.update({'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
@@ -42,10 +60,10 @@ class MovieDbService(object):
             return PersonsResponse(http_response.json()).get_persons()
         return None
 
-    def get_movies_in_theatres(self):
+    def get_movies_in_theatres(self, page=1):
         endpoint = self.BASE_URL + 'movie/now_playing'
         payload = self.BASE_PAYLOAD.copy()
-        payload.update({'region': 'US'})
+        payload.update({'region': 'US', 'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
             return MoviesResponse(http_response.json()).get_movies()

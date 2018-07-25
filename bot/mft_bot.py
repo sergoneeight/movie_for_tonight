@@ -41,6 +41,16 @@ def go_to_inline_popular_results(message):
     bot.send_message(message.chat.id, messages.POPULAR_PROMPT, reply_markup=markup_util.get_inline_popular_markup())
 
 
+@bot.message_handler(commands=['top_rated'])
+def go_to_inline_top_rated_results(message):
+    bot.send_message(message.chat.id, messages.TOP_RATED_PROMPT, reply_markup=markup_util.get_inline_top_rated_markup())
+
+
+@bot.message_handler(commands=['in_theaters'])
+def go_to_inline_in_theaters_results(message):
+    bot.send_message(message.chat.id, messages.IN_THEATERS_PROMPT, reply_markup=markup_util.get_inline_in_theaters_markup())
+
+
 @bot.inline_handler(func=lambda query: True)
 def search_query(query):
     offset = int(query.offset) if query.offset else 1
@@ -57,6 +67,15 @@ def search_query(query):
 
     elif SearchCallback.POPULAR_PEOPLE.value == query.query:
         results = movie_db_service.get_popular_people(page=offset)
+
+    elif SearchCallback.TOP_RATED_MOVIES.value == query.query:
+        results = movie_db_service.get_top_rated_movies(page=offset)
+
+    elif SearchCallback.TOP_RATED_TV_SHOWS.value == query.query:
+        results = movie_db_service.get_top_rated_tv_shows(page=offset)
+
+    elif SearchCallback.MOVIES_IN_THEATERS.value == query.query:
+        results = movie_db_service.get_movies_in_theatres(page=offset)
 
     elif GeneralCallback.MORE_LIKE_THIS.value in query.query:
         query_data = query.query.split('-')
