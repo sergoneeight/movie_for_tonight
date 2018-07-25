@@ -1,6 +1,9 @@
+import textwrap
+
 from api.model.base_multiple_response import BaseMultipleResponse
 from api.model.genres import Genre
 from api.model.image import Image
+from bot.config import MAX_TITLE_CHARS, MAX_DESCRIPTION_CHARS
 
 
 class TVShowsResponse(BaseMultipleResponse):
@@ -53,6 +56,10 @@ class TVShow(object):
         return self._title + ' ({year})'.format(year=self.release_year)
 
     @property
+    def formatted_title(self):
+        return textwrap.shorten(self._title, MAX_TITLE_CHARS, placeholder=u'\u2026') + ' ({year})'.format(year=self.release_year)
+
+    @property
     def first_air_year(self):
         return self.first_air_date.split('-')[0]
 
@@ -66,7 +73,7 @@ class TVShow(object):
 
     @property
     def formatted_genres(self):
-        return ', '.join(self.genres)
+        return textwrap.shorten(', '.join(self.genres), MAX_DESCRIPTION_CHARS, placeholder=u'\u2026')
 
     @property
     def release_year(self):

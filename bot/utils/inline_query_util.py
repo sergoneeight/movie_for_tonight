@@ -16,7 +16,7 @@ def generate_inline_search_results(search_results):
 
             item = InlineQueryResultArticle(
                 id=item_num,
-                title=search_item.title,
+                title=search_item.formatted_title,
                 description=search_item.description,
                 reply_markup=replay_markup,
                 input_message_content=InputTextMessageContent(

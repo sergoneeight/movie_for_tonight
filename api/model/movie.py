@@ -1,6 +1,9 @@
+import textwrap
+
 from api.model.base_multiple_response import BaseMultipleResponse
 from api.model.genres import Genre
 from api.model.image import Image
+from bot.config import MAX_TITLE_CHARS, MAX_DESCRIPTION_CHARS
 
 
 class MoviesResponse(BaseMultipleResponse):
@@ -50,16 +53,12 @@ class Movie(object):
             star=self.gold_star)
 
     @property
-    def description_with_url(self):
-        return '<a href="{url}">{movie_title} ({year})</a>'.format(
-            url=self.details_url, movie_title=self.title,
-            year=self.release_year) + '\n' + self.formatted_genres + '\n' + '<b>{rating}</b>{star}'.format(
-            rating=self.vote_average,
-            star=self.gold_star) + '\n\n'
-
-    @property
     def title(self):
         return self._title + ' ({year})'.format(year=self.release_year)
+
+    @property
+    def formatted_title(self):
+        return textwrap.shorten(self._title, MAX_TITLE_CHARS, placeholder=u'\u2026') + ' ({year})'.format(year=self.release_year)
 
     @property
     def poster_url(self):
@@ -93,7 +92,7 @@ class Movie(object):
 
     @property
     def formatted_genres(self):
-        return ', '.join(self.genres)
+        return textwrap.shorten(', '.join(self.genres), MAX_DESCRIPTION_CHARS, placeholder=u'\u2026')
 
     @property
     def title_with_year(self):

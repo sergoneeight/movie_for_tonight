@@ -1,8 +1,10 @@
+import textwrap
 from enum import Enum
 
 from api.model.base_multiple_response import BaseMultipleResponse
 from api.model.genres import Genre
 from api.model.image import Image
+from bot.config import MAX_TITLE_CHARS, MAX_DESCRIPTION_CHARS
 
 
 class MultiSearchResponse(BaseMultipleResponse):
@@ -60,6 +62,12 @@ class MultiSearchItem(object):
         return ''
 
     @property
+    def formatted_title(self):
+        if self.media_type == self.MediaType.PERSON.value:
+            return self._title
+        return textwrap.shorten(self._title, MAX_TITLE_CHARS, placeholder=u'\u2026') + ' ({year})'.format(year=self.__get_release_year())
+
+    @property
     def description(self):
         if self.media_type == self.MediaType.MOVIE.value or self.media_type == self.MediaType.TV_SHOW.value:
             description = u'{genres}\n{rating} {star}'.format(
@@ -76,7 +84,7 @@ class MultiSearchItem(object):
         if self.media_type == self.MediaType.MOVIE.value or self.media_type == self.MediaType.TV_SHOW.value:
             caption = '<b>{title}</b>\n{genres}\n<b>{rating}</b> {star}<a href="{url}">&#160</a>'.format(
                 url=self.poster_url,
-                title=self.title,
+                title=self.formatted_title,
                 genres=self.__get_formatted_genres(),
                 rating=self._vote_average,
                 star=self.gold_star)
@@ -112,7 +120,7 @@ class MultiSearchItem(object):
         return [Genre.title(genre_id) for genre_id in self._genre_ids]
 
     def __get_formatted_genres(self):
-        return ', '.join(self.__get_genres())
+        return textwrap.shorten(', '.join(self.__get_genres()), MAX_DESCRIPTION_CHARS, placeholder=u'\u2026')
 
     def __get_release_year(self):
         return self._release_date.split('-')[0]

@@ -30,6 +30,10 @@ class Person(object):
         return self.media_type.capitalize()
 
     @property
+    def formatted_title(self):
+        return self.title
+
+    @property
     def caption(self):
         return '<b>{name}</b>\n{type}<a href="{url}">&#160</a>'.format(
             name=self.title,
