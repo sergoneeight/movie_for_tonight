@@ -1,17 +1,5 @@
-from api.model.base_multiple_response import BaseMultipleResponse
 from api.model.image import Image
-
-
-class PersonsResponse(BaseMultipleResponse):
-    def __init__(self, response_dict):
-        super().__init__(response_dict)
-
-    def get_persons(self):
-        persons = []
-        for item in self.results:
-            person = Person(item)
-            persons.append(person)
-        return persons
+from api.model.media_type import MediaType
 
 
 class Person(object):
@@ -23,11 +11,12 @@ class Person(object):
         self.id = response_dict['id']
         self.title = response_dict['name']
         self._profile_path = response_dict['profile_path']
-        self.media_type = 'person'
+        self._known_for = response_dict['known_for']
+        self.media_type = MediaType.PERSON.value
 
     @property
     def description(self):
-        return self.media_type.capitalize()
+        return self.known_for
 
     @property
     def formatted_title(self):
@@ -35,11 +24,15 @@ class Person(object):
 
     @property
     def caption(self):
-        return '<b>{name}</b>\n{type}<a href="{url}">&#160</a>'.format(
+        return '<b>{name}</b>\n{known_for}<a href="{url}">&#160</a>'.format(
             name=self.title,
-            type=self.media_type.capitalize(),
+            known_for=self.known_for,
             url=self.poster_url
         )
+
+    @property
+    def known_for(self):
+        return ', '.join([item['title'] if item['media_type'] == MediaType.MOVIE.value else item['name'] for item in self._known_for])
 
     @property
     def details_url(self):

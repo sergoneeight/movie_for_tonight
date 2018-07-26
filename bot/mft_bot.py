@@ -3,7 +3,7 @@ from flask_sslify import SSLify
 from telebot import types, TeleBot
 
 import misc
-from api.model.multi_search import MultiSearchItem
+from api.model.media_type import MediaType
 from api.movie_db_service import MovieDbService
 from bot.callbacks import SearchCallback, RandomMovieCallback, GeneralCallback
 from bot.utils import markup_util, inline_query_util, messages
@@ -82,7 +82,7 @@ def search_query(query):
         item_id = query_data[2]
         media_type = query_data[1]
 
-        if MultiSearchItem.MediaType.TV_SHOW.value == media_type:
+        if MediaType.TV_SHOW.value == media_type:
             results = movie_db_service.get_tv_show_recommendations(tv_show_id=item_id, page=offset)
         else:
             results = movie_db_service.get_movie_recommendations(movie_id=item_id, page=offset)

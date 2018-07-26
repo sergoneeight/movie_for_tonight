@@ -1,25 +1,14 @@
 import textwrap
 
-from api.model.base_multiple_response import BaseMultipleResponse
 from api.model.genres import Genre
 from api.model.image import Image
+from api.model.media_type import MediaType
 from bot.config import MAX_TITLE_CHARS, MAX_DESCRIPTION_CHARS
-
-
-class TVShowsResponse(BaseMultipleResponse):
-    def __init__(self, response_dict):
-        super().__init__(response_dict)
-
-    def get_tv_shows(self):
-        tv_shows = []
-        for item in self.results:
-            tv_show = TVShow(item)
-            tv_shows.append(tv_show)
-        return tv_shows
 
 
 class TVShow(object):
     BASE_TV_SHOW_URL = 'https://www.themoviedb.org/tv/'
+    POSTER_PLACEHOLDER = 'https://critics.io/img/movies/poster-placeholder.png'
 
     def __init__(self, response_dict):
         self.id = response_dict['id']
@@ -32,7 +21,7 @@ class TVShow(object):
         self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']
         self.gold_star = u'\u2B50'
-        self.media_type = 'tv'
+        self.media_type = MediaType.TV_SHOW.value
 
     @property
     def description(self):
@@ -81,7 +70,9 @@ class TVShow(object):
 
     @property
     def poster_url(self):
-        return Image.BASE_URL + Image.PosterSize.MEDIUM.value + self._poster_path
+        if self._poster_path:
+            return Image.BASE_URL + Image.PosterSize.LARGE.value + self._poster_path
+        return self.POSTER_PLACEHOLDER
 
     @property
     def backdrop_url(self):

@@ -1,21 +1,9 @@
 import textwrap
 
-from api.model.base_multiple_response import BaseMultipleResponse
 from api.model.genres import Genre
 from api.model.image import Image
+from api.model.media_type import MediaType
 from bot.config import MAX_TITLE_CHARS, MAX_DESCRIPTION_CHARS
-
-
-class MoviesResponse(BaseMultipleResponse):
-    def __init__(self, response_dict):
-        super().__init__(response_dict)
-
-    def get_movies(self):
-        movies = []
-        for item in self.results:
-            movie = Movie(item)
-            movies.append(movie)
-        return movies
 
 
 class Movie(object):
@@ -33,7 +21,7 @@ class Movie(object):
         self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']
         self.gold_star = u'\u2B50'
-        self.media_type = 'movie'
+        self.media_type = MediaType.MOVIE.value
 
     @property
     def caption(self):
@@ -69,7 +57,7 @@ class Movie(object):
     @property
     def poster_thumb_url(self):
         if self._poster_path:
-            return Image.BASE_URL + Image.PosterSize.SMALL.value + self._poster_path
+            return Image.BASE_URL + Image.PosterSize.MEDIUM.value + self._poster_path
         return self.POSTER_PLACEHOLDER
 
     @property

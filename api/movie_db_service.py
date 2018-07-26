@@ -3,11 +3,8 @@ from random import randint
 import requests
 
 import misc
+from api.model.base_multiple_response import MultipleResponse, ResponseType
 from api.model.filter import DiscoverMoviesFilter
-from api.model.movie import MoviesResponse
-from api.model.multi_search import MultiSearchResponse
-from api.model.person import PersonsResponse
-from api.model.tv_show import TVShowsResponse
 
 
 class MovieDbService(object):
@@ -21,7 +18,7 @@ class MovieDbService(object):
         payload.update({'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
-            return MoviesResponse(http_response.json()).get_movies()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.MOVIE).results
         return None
 
     def get_top_rated_movies(self, page=1):
@@ -30,7 +27,7 @@ class MovieDbService(object):
         payload.update({'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
-            return MoviesResponse(http_response.json()).get_movies()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.MOVIE).results
         return None
 
     def get_popular_tv_shows(self, page=1):
@@ -39,7 +36,7 @@ class MovieDbService(object):
         payload.update({'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
-            return TVShowsResponse(http_response.json()).get_tv_shows()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.TV_SHOW).results
         return None
 
     def get_top_rated_tv_shows(self, page=1):
@@ -48,16 +45,16 @@ class MovieDbService(object):
         payload.update({'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
-            return TVShowsResponse(http_response.json()).get_tv_shows()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.TV_SHOW).results
         return None
 
     def get_popular_people(self, page=1):
         endpoint = self.BASE_URL + 'person/popular'
         payload = self.BASE_PAYLOAD.copy()
         payload.update({'page': str(page)})
-        http_response = requests.get(endpoint, params=payload)
+        http_response = requests.get(endpoint, params=payload, verify=False)
         if http_response.status_code == 200:
-            return PersonsResponse(http_response.json()).get_persons()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.PERSON).results
         return None
 
     def get_movies_in_theatres(self, page=1):
@@ -66,7 +63,7 @@ class MovieDbService(object):
         payload.update({'region': 'US', 'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
-            return MoviesResponse(http_response.json()).get_movies()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.MOVIE).results
         return None
 
     def get_movie_recommendations(self, movie_id, page=1):
@@ -75,7 +72,7 @@ class MovieDbService(object):
         payload.update({'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
-            return MoviesResponse(http_response.json()).get_movies()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.MOVIE).results
         return None
 
     def get_tv_show_recommendations(self, tv_show_id, page=1):
@@ -84,7 +81,7 @@ class MovieDbService(object):
         payload.update({'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
-            return TVShowsResponse(http_response.json()).get_tv_shows()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.TV_SHOW).results
         return None
 
     def get_random_movie(self):
@@ -95,16 +92,7 @@ class MovieDbService(object):
         payload.update(DiscoverMoviesFilter(page=random_page).filter)
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
-            return MoviesResponse(http_response.json()).get_movies()[randint(1, 19)]
-        return None
-
-    def search_movies(self, query):
-        endpoint = self.BASE_URL + 'search/movie'
-        payload = self.BASE_PAYLOAD.copy()
-        payload.update({'query': str(query)})
-        http_response = requests.get(endpoint, params=payload)
-        if http_response.status_code == 200:
-            return MoviesResponse(http_response.json()).get_movies()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.MOVIE).results[randint(1, 19)]
         return None
 
     def multi_search(self, query, page=1):
@@ -113,5 +101,11 @@ class MovieDbService(object):
         payload.update({'query': str(query), 'page': str(page)})
         http_response = requests.get(endpoint, params=payload)
         if http_response.status_code == 200:
-            return MultiSearchResponse(http_response.json()).get_search_items()
+            return MultipleResponse(http_response.json(), response_type=ResponseType.MULTI_SEARCH).results
         return None
+
+    def get_movie_details(self, movie_id):
+        pass
+
+    def get_tv_show_details(self, tv_show_id):
+        pass
