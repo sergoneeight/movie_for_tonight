@@ -104,7 +104,11 @@ def search_query(query):
     else:
         results = movie_db_service.multi_search(query=query.query, page=offset)
 
+    if results is None:
+        results = []
+
     offset = offset + 1 if len(results) > 0 else ''
+
     bot.answer_inline_query(
         inline_query_id=query.id,
         results=inline_query_util.generate_inline_search_results(results),

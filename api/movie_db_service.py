@@ -55,14 +55,14 @@ class MovieDbService(object):
 
     def get_movie_recommendations(self, movie_id, page=1):
         endpoint = self.BASE_URL + 'movie/{movie_id}/recommendations'.format(movie_id=movie_id)
-        http_response = requests.get(endpoint, params=Payload(page=page))
+        http_response = requests.get(endpoint, params=Payload(page=page), verify=False)
         if http_response.status_code == 200:
             return MultipleResponse(http_response.json(), response_type=ResponseType.MOVIE).results
         return None
 
     def get_tv_show_recommendations(self, tv_show_id, page=1):
         endpoint = self.BASE_URL + 'tv/{tv_show_id}/recommendations'.format(tv_show_id=tv_show_id)
-        http_response = requests.get(endpoint, params=Payload(page=page))
+        http_response = requests.get(endpoint, params=Payload(page=page), verify=False)
         if http_response.status_code == 200:
             return MultipleResponse(http_response.json(), response_type=ResponseType.TV_SHOW).results
         return None
