@@ -77,6 +77,21 @@ def search_query(query):
     elif SearchCallback.MOVIES_IN_THEATERS.value == query.query:
         results = movie_db_service.get_movies_in_theatres(page=offset)
 
+    elif '$videos' in query.query:
+        query_data = query.query.split('-')
+        item_id = query_data[1]
+        # media_type = query_data[1]
+
+        results = movie_db_service.get_movie_videos(item_id)
+        offset = offset + 1 if len(results) > 0 else ''
+        bot.answer_inline_query(
+            inline_query_id=query.id,
+            results=inline_query_util.generate_inline_videos_results(results),
+            next_offset=offset,
+            cache_time=0,
+            is_personal=True
+        )
+
     elif GeneralCallback.MORE_LIKE_THIS.value in query.query:
         query_data = query.query.split('-')
         item_id = query_data[2]
@@ -90,13 +105,13 @@ def search_query(query):
         results = movie_db_service.multi_search(query=query.query, page=offset)
 
     offset = offset + 1 if len(results) > 0 else ''
-    bot.answer_inline_query(
-        inline_query_id=query.id,
-        results=inline_query_util.generate_inline_search_results(results),
-        next_offset=offset,
-        cache_time=0,
-        is_personal=True
-    )
+    # bot.answer_inline_query(
+    #     inline_query_id=query.id,
+    #     results=inline_query_util.generate_inline_search_results(results),
+    #     next_offset=offset,
+    #     cache_time=0,
+    #     is_personal=True
+    # )
 
 
 # Markup button handlers
@@ -133,4 +148,5 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run()
+    # app.run()
+    bot.polling()

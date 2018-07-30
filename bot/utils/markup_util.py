@@ -18,7 +18,12 @@ def get_random_movie_markup(movie):
     markup = InlineKeyboardMarkup()
     details_btn = InlineKeyboardButton(text=DETAILS_BTN_NAME, url=movie.details_url)
     retry_btn = InlineKeyboardButton(text=RETRY_BTN_NAME, callback_data=RandomMovieCallback.NEW_RANDOM_MOVIE.value)
+    trailer_btn = InlineKeyboardButton(text='VIDEOS', switch_inline_query_current_chat='{callback}-{id}'.format(
+        callback='$videos',
+        id=movie.id,
+    ))
     markup.row(details_btn, retry_btn)
+    markup.row(trailer_btn)
     markup.row(__more_like_this_btn(movie))
     return markup
 
@@ -90,7 +95,12 @@ def get_inline_in_theaters_markup():
 def get_inline_search_result_markup(search_item):
     markup = InlineKeyboardMarkup()
     details_btn = InlineKeyboardButton(text=DETAILS_BTN_NAME, url=search_item.details_url)
+    trailer_btn = InlineKeyboardButton(text='VIDEOS', switch_inline_query_current_chat='{callback}-{id}'.format(
+        callback='$videos',
+        id=search_item.id,
+    ))
     markup.row(details_btn)
+    markup.row(trailer_btn)
     markup.row(__more_like_this_btn(search_item))
     return markup
 

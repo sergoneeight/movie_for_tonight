@@ -4,6 +4,7 @@ from api.model.media_type import MediaType
 from api.model.movie import Movie
 from api.model.person import Person
 from api.model.tv_show import TVShow
+from api.model.video import Video
 
 
 class MultipleResponse(object):
@@ -39,6 +40,20 @@ class MultipleResponse(object):
                     return TVShow(response_dict)
                 elif item_media_type == MediaType.PERSON.value:
                     return Person(response_dict)
+
+
+class VideosResponse(object):
+    def __init__(self, response_dict):
+        self.id = response_dict['id']
+        self._results = response_dict['results']
+
+    @property
+    def videos(self):
+        results = []
+        for item in self._results:
+            item = Video(item)
+            results.append(item)
+        return results
 
 
 class ResponseType(Enum):

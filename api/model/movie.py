@@ -3,6 +3,7 @@ import textwrap
 from api.model.genres import Genre
 from api.model.image import Image
 from api.model.media_type import MediaType
+from api.model.video import Video, VideoType
 from bot.config import MAX_TITLE_CHARS, MAX_DESCRIPTION_CHARS
 
 
