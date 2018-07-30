@@ -59,6 +59,21 @@ def search_query(query):
     if len(query.query) == 0:
         bot.answer_inline_query(query.id, [], cache_time=0)
 
+    if GeneralCallback.VIDEOS.value in query.query:
+        query_data = query.query.split('-')
+        item_id = query_data[2]
+        media_type = query_data[1]
+        if media_type == MediaType.TV_SHOW.value:
+            videos = inline_query_util.generate_inline_videos_results(movie_db_service.get_tv_shows_videos(item_id))
+        else:
+            videos = inline_query_util.generate_inline_videos_results(movie_db_service.get_movie_videos(item_id))
+
+        bot.answer_inline_query(
+            inline_query_id=query.id,
+            results=videos,
+            cache_time=0
+        )
+
     elif SearchCallback.POPULAR_MOVIES.value == query.query:
         results = movie_db_service.get_popular_movies(page=offset)
 
@@ -77,21 +92,6 @@ def search_query(query):
     elif SearchCallback.MOVIES_IN_THEATERS.value == query.query:
         results = movie_db_service.get_movies_in_theatres(page=offset)
 
-    elif '$videos' in query.query:
-        query_data = query.query.split('-')
-        item_id = query_data[1]
-        # media_type = query_data[1]
-
-        results = movie_db_service.get_movie_videos(item_id)
-        offset = offset + 1 if len(results) > 0 else ''
-        bot.answer_inline_query(
-            inline_query_id=query.id,
-            results=inline_query_util.generate_inline_videos_results(results),
-            next_offset=offset,
-            cache_time=0,
-            is_personal=True
-        )
-
     elif GeneralCallback.MORE_LIKE_THIS.value in query.query:
         query_data = query.query.split('-')
         item_id = query_data[2]
@@ -105,13 +105,13 @@ def search_query(query):
         results = movie_db_service.multi_search(query=query.query, page=offset)
 
     offset = offset + 1 if len(results) > 0 else ''
-    # bot.answer_inline_query(
-    #     inline_query_id=query.id,
-    #     results=inline_query_util.generate_inline_search_results(results),
-    #     next_offset=offset,
-    #     cache_time=0,
-    #     is_personal=True
-    # )
+    bot.answer_inline_query(
+        inline_query_id=query.id,
+        results=inline_query_util.generate_inline_search_results(results),
+        next_offset=offset,
+        cache_time=0,
+        is_personal=True
+    )
 
 
 # Markup button handlers

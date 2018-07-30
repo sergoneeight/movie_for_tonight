@@ -30,8 +30,22 @@ def generate_inline_search_results(search_results):
 
 def generate_inline_videos_results(search_results):
     results = []
-    for item_num, item in enumerate(search_results):
-        item = InlineQueryResultVideo(id=item_num, video_url=item.url, title=item.name, caption=item.type, mime_type='video/mp4',
-                                      thumb_url='http://www.ataka.bg/wp-content/themes/hoxa/assets/images/default.jpg')
+    for item_num, search_item in enumerate(search_results):
+        # item = InlineQueryResultVideo(id=item_num, video_url=search_item.url, title=search_item.name, mime_type='video/mp4',
+        #                               thumb_url=search_item.thumbnail,
+        #                               input_message_content=InputTextMessageContent(
+        #                                   message_text='<b>{title}</b><a href="{url}">&#160</a>'.format(title=search_item.name,
+        #                                                                                                 url=search_item.url),
+        #                                   parse_mode='HTML'
+        #                               ))
+        item = InlineQueryResultArticle(
+            id=item_num,
+            title=search_item.name,
+            input_message_content=InputTextMessageContent(
+                message_text='<b>{title}</b><a href="{url}">&#160</a>'.format(title=search_item.name, url=search_item.url),
+                parse_mode='HTML'
+            ),
+            thumb_url=search_item.thumbnail
+        )
         results.append(item)
     return results

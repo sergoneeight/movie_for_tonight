@@ -12,14 +12,16 @@ MOVIES_BTN_NAME = u'MOVIES'
 TV_SHOWS_BTN_NAME = u'TV SHOWS'
 POPULAR_PEOPLE_BTN_NAME = u'PEOPLE'
 IN_THEATERS_BTN_NAME = u'IN THEATERS'
+VIDEOS_BTN_NAME = u'VIDEOS'
 
 
 def get_random_movie_markup(movie):
     markup = InlineKeyboardMarkup()
     details_btn = InlineKeyboardButton(text=DETAILS_BTN_NAME, url=movie.details_url)
     retry_btn = InlineKeyboardButton(text=RETRY_BTN_NAME, callback_data=RandomMovieCallback.NEW_RANDOM_MOVIE.value)
-    trailer_btn = InlineKeyboardButton(text='VIDEOS', switch_inline_query_current_chat='{callback}-{id}'.format(
-        callback='$videos',
+    trailer_btn = InlineKeyboardButton(text=VIDEOS_BTN_NAME, switch_inline_query_current_chat='{callback}-{media_type}-{id}'.format(
+        callback=GeneralCallback.VIDEOS.value,
+        media_type=movie.media_type,
         id=movie.id,
     ))
     markup.row(details_btn, retry_btn)
@@ -95,12 +97,13 @@ def get_inline_in_theaters_markup():
 def get_inline_search_result_markup(search_item):
     markup = InlineKeyboardMarkup()
     details_btn = InlineKeyboardButton(text=DETAILS_BTN_NAME, url=search_item.details_url)
-    trailer_btn = InlineKeyboardButton(text='VIDEOS', switch_inline_query_current_chat='{callback}-{id}'.format(
-        callback='$videos',
-        id=search_item.id,
+    videos_btn = InlineKeyboardButton(text=VIDEOS_BTN_NAME, switch_inline_query_current_chat='{callback}-{media_type}-{id}'.format(
+        callback=GeneralCallback.VIDEOS.value,
+        media_type=search_item.media_type,
+        id=search_item.id
     ))
     markup.row(details_btn)
-    markup.row(trailer_btn)
+    markup.row(videos_btn)
     markup.row(__more_like_this_btn(search_item))
     return markup
 

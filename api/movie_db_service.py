@@ -5,9 +5,6 @@ import requests
 
 import misc
 from api.model.base_multiple_response import MultipleResponse, ResponseType, VideosResponse
-from api.model.media_type import MediaType
-from api.model.movie import Movie
-from api.model.video import Video
 
 
 class MovieDbService(object):
@@ -93,24 +90,16 @@ class MovieDbService(object):
             return MultipleResponse(http_response.json(), response_type=ResponseType.MOVIE).results
         return None
 
-    def get_movie_details(self, movie_id):
-        endpoint = self.BASE_URL + 'movie/{movie_id}'.format(movie_id=movie_id)
-        http_response = requests.get(endpoint, params=Payload(append_to_response='videos'))
-        if http_response.status_code == 200:
-            return Movie(http_response.json())
-        return None
-
-    def get_media_details(self, media):
-        if media.media_type == MediaType.MOVIE.value:
-            return self.get_movie_details(media.id)
-        elif media.media_type == MediaType.TV_SHOW.value:
-            pass
-
-        return ''
-
     def get_movie_videos(self, movie_id):
         endpoint = self.BASE_URL + 'movie/{movie_id}/videos'.format(movie_id=movie_id)
-        http_response = requests.get(endpoint, params=Payload())
+        http_response = requests.get(endpoint, params=Payload(), verify=False)
+        if http_response.status_code == 200:
+            return VideosResponse(http_response.json()).videos
+        return None
+
+    def get_tv_shows_videos(self, tv_show_id):
+        endpoint = self.BASE_URL + 'tv/{tv_id}/videos'.format(tv_id=tv_show_id)
+        http_response = requests.get(endpoint, params=Payload(), verify=False)
         if http_response.status_code == 200:
             return VideosResponse(http_response.json()).videos
         return None
