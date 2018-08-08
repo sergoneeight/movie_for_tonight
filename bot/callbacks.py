@@ -16,4 +16,4 @@ class RandomMovieCallback(Enum):
 
 class GeneralCallback(Enum):
     MORE_LIKE_THIS = '_like'
-    VIDEOS = '_videos'
+    VIDEOS = '_vid'
