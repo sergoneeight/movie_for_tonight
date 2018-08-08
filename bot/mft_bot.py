@@ -16,7 +16,7 @@ movie_db_service = MovieDbService()
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.send_message(message.chat.id, text=messages.WELCOME, parse_mode='HTML')
+    bot.send_message(message.chat.id, text=messages.WELCOME, parse_mode='HTML', disable_web_page_preview=True)
 
 
 @bot.message_handler(commands=['random_movie'])

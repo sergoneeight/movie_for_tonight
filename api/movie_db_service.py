@@ -41,7 +41,7 @@ class MovieDbService(object):
 
     def get_popular_people(self, page=1):
         endpoint = self.BASE_URL + 'person/popular'
-        http_response = requests.get(endpoint, params=Payload(page=page))
+        http_response = requests.get(endpoint, params=Payload(page=page), verify=False)
         if http_response.status_code == 200:
             return MultipleResponse(http_response.json(), response_type=ResponseType.PERSON).results
         return None

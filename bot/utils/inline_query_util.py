@@ -41,6 +41,7 @@ def generate_inline_videos_results(search_results):
         item = InlineQueryResultArticle(
             id=item_num,
             title=search_item.name,
+            description=search_item.type,
             input_message_content=InputTextMessageContent(
                 message_text='<b>{title}</b><a href="{url}">&#160</a>'.format(title=search_item.name, url=search_item.url),
                 parse_mode='HTML'

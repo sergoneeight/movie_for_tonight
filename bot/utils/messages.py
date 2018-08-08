@@ -2,6 +2,7 @@ WELCOME = u"""MovieForTonight bot can help you find any movie, tv show or person
 To start searching just type @movieftbot in the text field.
 You can check what movies, tv shows and people are currently popular,
 get list of currently playing movies in theaters, top rated movies, tv shows and much more.
+Please rate us: https://telegram.me/storebot?start=movieftbot
 
 <b>Commands:</b>
 /search - start search for a movie, tv show, person

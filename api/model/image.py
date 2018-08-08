@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class Image(object):
-    BASE_URL = 'http://image.tmdb.org/t/p/'
+    BASE_URL = 'https://image.tmdb.org/t/p/'
 
     class BackdropSize(Enum):
         SMALL = 'w300'
