@@ -6,10 +6,10 @@ get list of currently playing movies in theaters, top rated movies, tv shows and
 <b>Please rate us:</b> https://telegram.me/storebot?start=movieftbot
 
 <b>Commands:</b>
-/search - start search for a movie, tv show, person
-/in_theaters - shows a list of movies currently playing in theaters
-/popular - shows a list of currently popular movies, tv shows or people
-/top_rated - shows a list of top rated movies, tv shows
+/search - for a movie, tv show or person
+/in_theaters - movies playing in theaters
+/popular - popular movies, tv shows or people
+/top_rated - movies or tv shows
 /random_movie - shows random movie
 """
 POPULAR_PROMPT = 'Select to see currently popular:'

@@ -8,6 +8,7 @@ class SearchCallback(Enum):
     TOP_RATED_MOVIES = '_top_rated_movies'
     TOP_RATED_TV_SHOWS = '_top_rated_tv_shows'
     MOVIES_IN_THEATERS = '_movies_in_theaters'
+    UPCOMING_MOVIES = '_upcoming_movies'
 
 
 class RandomMovieCallback(Enum):

@@ -104,6 +104,13 @@ class MovieDbService(object):
             return VideosResponse(http_response.json()).videos
         return None
 
+    def get_upcoming_movies(self, page=1):
+        endpoint = self.BASE_URL + 'movie/upcoming'
+        http_response = requests.get(endpoint, params=Payload(page=page))
+        if http_response.status_code == 200:
+            return MultipleResponse(http_response.json(), response_type=ResponseType.MOVIE).results
+        return None
+
     def discover_tv_shows(self, search_filter):
         pass
 
@@ -124,7 +131,7 @@ class Payload(dict):
             self,
             api_key=misc.MOVIE_DB_API_KEY,
             language='en-US',
-            region=None,
+            region='US',
             sort_by=None,
             page=1,
             release_date_greater_than=None,
@@ -132,9 +139,11 @@ class Payload(dict):
             vote_average_grater_than=None,
             with_genres=None,
             without_genres=None,
+            with_release_type=None,
             query=None,
             primary_release_year=None,
-            append_to_response=None
+            append_to_response=None,
+            primary_release_date_grater_than=None
     ):
         super().__init__()
         self.update({
@@ -150,5 +159,7 @@ class Payload(dict):
             'without_genres': without_genres,
             'query': query,
             'primary_release_year': primary_release_year,
-            'append_to_response': append_to_response
+            'append_to_response': append_to_response,
+            'primary_release_date.gte': primary_release_date_grater_than,
+            'with_release_type': with_release_type
         })

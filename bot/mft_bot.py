@@ -77,6 +77,9 @@ def search_query(query):
     elif SearchCallback.POPULAR_MOVIES.value == query.query:
         results = movie_db_service.get_popular_movies(page=offset)
 
+    elif SearchCallback.UPCOMING_MOVIES.value == query.query:
+        results = movie_db_service.get_upcoming_movies(page=offset)
+
     elif SearchCallback.POPULAR_TV_SHOWS.value == query.query:
         results = movie_db_service.get_popular_tv_shows(page=offset)
 
