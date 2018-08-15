@@ -14,7 +14,7 @@ class Movie(object):
     def __init__(self, response_dict):
         self.id = response_dict['id']
         self._title = response_dict['title']
-        self.vote_average = response_dict['vote_average']
+        self._vote_average = response_dict['vote_average']
         self.vote_count = response_dict['vote_count']
         self.overview = response_dict['overview']
         self.release_date = response_dict['release_date']
@@ -40,6 +40,12 @@ class Movie(object):
             genres=self.formatted_genres,
             rating=self.vote_average,
             star=self.gold_star)
+
+    @property
+    def vote_average(self):
+        if self._vote_average == 0:
+            return 'No ratings'
+        return self._vote_average
 
     @property
     def title(self):

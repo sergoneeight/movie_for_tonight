@@ -8,7 +8,8 @@ get list of currently playing movies in theaters, top rated movies, tv shows and
 <b>Commands:</b>
 /search - for a movie, tv show or person
 /in_theaters - movies playing in theaters
-/popular - popular movies, tv shows or people
+/on_tv - tv shows that are currently on the air
+/popular - movies, tv shows or people
 /top_rated - movies or tv shows
 /random_movie - shows random movie
 """
@@ -16,3 +17,4 @@ POPULAR_PROMPT = 'Select to see currently popular:'
 TOP_RATED_PROMPT = 'Select to see top rated:'
 IN_THEATERS_PROMPT = 'Click the button to show currently playing movies in theaters:'
 INLINE_SEARCH_PROMPT = 'Click the button to start searching for a movie, tv show, person'
+TV_ON_THE_AIR_PROMPT = 'Click the button to show tv shows that are currently on the air'

@@ -39,6 +39,13 @@ class MovieDbService(object):
             return MultipleResponse(http_response.json(), response_type=ResponseType.TV_SHOW).results
         return None
 
+    def get_tv_on_the_air(self, page=1):
+        endpoint = self.BASE_URL + 'tv/on_the_air'
+        http_response = requests.get(endpoint, params=Payload(page=page))
+        if http_response.status_code == 200:
+            return MultipleResponse(http_response.json(), response_type=ResponseType.TV_SHOW).results
+        return None
+
     def get_popular_people(self, page=1):
         endpoint = self.BASE_URL + 'person/popular'
         http_response = requests.get(endpoint, params=Payload(page=page), verify=False)

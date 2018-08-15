@@ -12,6 +12,7 @@ MOVIES_BTN_NAME = u'MOVIES'
 TV_SHOWS_BTN_NAME = u'TV SHOWS'
 POPULAR_PEOPLE_BTN_NAME = u'PEOPLE'
 IN_THEATERS_BTN_NAME = u'IN THEATERS'
+ON_TV_BUTTON_NAME = u'ON TV'
 VIDEOS_BTN_NAME = u'VIDEOS'
 
 
@@ -91,6 +92,16 @@ def get_inline_in_theaters_markup():
         switch_inline_query_current_chat=SearchCallback.MOVIES_IN_THEATERS.value
     )
     markup.add(in_theaters_btn)
+    return markup
+
+
+def get_inline_on_tv_markup():
+    markup = InlineKeyboardMarkup()
+    on_tv_btn = InlineKeyboardButton(
+        text=ON_TV_BUTTON_NAME,
+        switch_inline_query_current_chat=SearchCallback.TV_ON_THE_AIR.value
+    )
+    markup.add(on_tv_btn)
     return markup
 
 

@@ -51,6 +51,11 @@ def go_to_inline_in_theaters_results(message):
     bot.send_message(message.chat.id, messages.IN_THEATERS_PROMPT, reply_markup=markup_util.get_inline_in_theaters_markup())
 
 
+@bot.message_handler(commands=['on_tv'])
+def go_to_inline_in_theaters_results(message):
+    bot.send_message(message.chat.id, messages.TV_ON_THE_AIR_PROMPT, reply_markup=markup_util.get_inline_on_tv_markup())
+
+
 @bot.inline_handler(func=lambda query: True)
 def search_query(query):
     offset = int(query.offset) if query.offset else 1
@@ -77,8 +82,8 @@ def search_query(query):
     elif SearchCallback.POPULAR_MOVIES.value == query.query:
         results = movie_db_service.get_popular_movies(page=offset)
 
-    elif SearchCallback.UPCOMING_MOVIES.value == query.query:
-        results = movie_db_service.get_upcoming_movies(page=offset)
+    elif SearchCallback.TV_ON_THE_AIR.value == query.query:
+        results = movie_db_service.get_tv_on_the_air(page=offset)
 
     elif SearchCallback.POPULAR_TV_SHOWS.value == query.query:
         results = movie_db_service.get_popular_tv_shows(page=offset)

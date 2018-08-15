@@ -14,7 +14,7 @@ class TVShow(object):
         self.id = response_dict['id']
         self._title = response_dict['name']
         self.overview = response_dict['overview']
-        self.vote_average = response_dict['vote_average']
+        self._vote_average = response_dict['vote_average']
         self.vote_count = response_dict['vote_count']
         self.first_air_date = response_dict['first_air_date']
         self._poster_path = response_dict['poster_path']
@@ -39,6 +39,12 @@ class TVShow(object):
             genres=self.formatted_genres,
             rating=self.vote_average,
             star=self.gold_star)
+
+    @property
+    def vote_average(self):
+        if self._vote_average == 0:
+            return 'No ratings'
+        return self._vote_average
 
     @property
     def title(self):
