@@ -3,7 +3,6 @@ import textwrap
 from api.model.genres import Genre
 from api.model.image import Image
 from api.model.media_type import MediaType
-from api.model.video import Video, VideoType
 from bot.config import MAX_TITLE_CHARS, MAX_DESCRIPTION_CHARS
 
 
@@ -17,7 +16,10 @@ class Movie(object):
         self._vote_average = response_dict['vote_average']
         self.vote_count = response_dict['vote_count']
         self.overview = response_dict['overview']
-        self.release_date = response_dict['release_date']
+        if 'release_date' not in response_dict:
+            self.release_date = ''
+        else:
+            self.release_date = response_dict['release_date']
         self._poster_path = response_dict['poster_path']
         self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']

@@ -8,10 +8,13 @@ def generate_inline_search_results(search_results):
     results = []
     if search_results:
         for item_num, search_item in enumerate(search_results):
+            # TODO change harcoded results count
+            if item_num == 20:
+                break
             if search_item.media_type == MediaType.PERSON.value:
                 replay_markup = markup_util.get_person_inline_search_result_markup(search_item)
             else:
-                replay_markup = markup_util.get_inline_search_result_markup(search_item)
+                replay_markup = markup_util.get_inline_general_search_result_markup(search_item)
 
             item = InlineQueryResultArticle(
                 id=item_num,
