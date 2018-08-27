@@ -16,6 +16,7 @@ class TVShow(object):
         self.overview = response_dict['overview']
         self._vote_average = response_dict['vote_average']
         self.vote_count = response_dict['vote_count']
+        self.popularity = response_dict['popularity']
         self.first_air_date = response_dict['first_air_date']
         self._poster_path = response_dict['poster_path']
         self._backdrop_path = response_dict['backdrop_path']

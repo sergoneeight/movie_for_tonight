@@ -16,6 +16,7 @@ class Movie(object):
         self._vote_average = response_dict['vote_average']
         self.vote_count = response_dict['vote_count']
         self.overview = response_dict['overview']
+        self.popularity = response_dict['popularity']
         if 'release_date' not in response_dict:
             self.release_date = ''
         else:

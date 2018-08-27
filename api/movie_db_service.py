@@ -123,7 +123,7 @@ class MovieDbService(object):
         endpoint = self.BASE_URL + 'person/{person_id}/combined_credits'.format(person_id=person_id)
         http_response = requests.get(endpoint, params=Payload())
         if http_response.status_code == 200:
-            return PersonCreditsResponse(http_response.json()).cast_media
+            return sorted(PersonCreditsResponse(http_response.json()).cast_media, key=lambda item: item.popularity, reverse=True)
         return None
 
     def discover_tv_shows(self, search_filter):
