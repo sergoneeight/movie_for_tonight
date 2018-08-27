@@ -3,6 +3,7 @@ from flask_sslify import SSLify
 from telebot import types, TeleBot
 
 import misc
+from api.adapters import ResultsAdapter
 from api.model.media_type import MediaType
 from api.movie_db_service import MovieDbService
 from bot.callbacks import SearchCallback, RandomMovieCallback, MarkupButtonsCallback
@@ -12,6 +13,7 @@ bot = TeleBot(misc.BOT_TOKEN, threaded=False)
 app = flask.Flask(__name__)
 sslify = SSLify(app)
 movie_db_service = MovieDbService()
+results_adapter = None
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -108,15 +110,13 @@ def search_query(query):
             results = movie_db_service.get_movie_recommendations(movie_id=item_id, page=offset)
 
     elif MarkupButtonsCallback.KNOWN_FOR.value in query.query:
-        results = movie_db_service.get_combined_cast(person_id=query.query.split('-')[1])
-        # TODO change bot answer here
-        bot.answer_inline_query(
-            inline_query_id=query.id,
-            results=inline_query_util.generate_inline_search_results(results),
-            next_offset='',
-            cache_time=0,
-            is_personal=True
-        )
+        if offset == 1:
+            cast_results = movie_db_service.get_combined_cast(person_id=query.query.split('-')[1])
+            global results_adapter
+            results_adapter = ResultsAdapter(cast_results)
+            results = results_adapter.next_chunk()
+        elif offset > 1:
+            results = results_adapter.next_chunk()
 
     elif SearchCallback.POPULAR_MOVIES.value == query.query:
         results = movie_db_service.get_popular_movies(page=offset)
