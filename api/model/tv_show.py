@@ -3,12 +3,13 @@ from datetime import datetime
 
 from api.model.genres import Genre
 from api.model.image import ImageConfig
+from api.model.media_type import MediaType
 from bot.config import MAX_DESCRIPTION_CHARS, MAX_TITLE_CHARS
 
 
 class TVShow(object):
     BASE_TV_SHOW_URL = 'https://www.themoviedb.org/tv/'
-    POSTER_PLACEHOLDER = 'https://critics.io/img/movies/poster-placeholder.png'
+    POSTER_PLACEHOLDER = 'https://www.beddingwarehouse.com.au/wp-content/uploads/2016/01/placeholder-featured-image-600x600.png'
 
     def __init__(self, response_dict):
         self.id = response_dict['id']
@@ -21,6 +22,7 @@ class TVShow(object):
         self._poster_path = response_dict['poster_path']
         self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']
+        self.media_type = MediaType.TV
         self.gold_star = u'\u2B50'
 
     @property
@@ -42,8 +44,8 @@ class TVShow(object):
 
     @property
     def shorten_title(self):
-        return textwrap.shorten(self.title, MAX_TITLE_CHARS, placeholder=u'\u2026') + '({year})'.format(
-            year=self.first_air_date.year) if self.first_air_date else ''
+        return textwrap.shorten(self.title, MAX_TITLE_CHARS, placeholder=u'\u2026') + (' ({year})'.format(
+            year=self.first_air_date.year) if self.first_air_date else '')
 
     @property
     def vote_average(self):
@@ -53,12 +55,13 @@ class TVShow(object):
 
     @property
     def first_air_date(self):
-        release_date = ''
+        date = ''
         try:
-            release_date = datetime.strptime(self._first_air_date, '%Y-%m-%d')
+            date = datetime.strptime(self._first_air_date, '%Y-%m-%d')
         except ValueError as e:
             print(e)
-        return release_date
+        finally:
+            return date
 
     @property
     def details_url(self):

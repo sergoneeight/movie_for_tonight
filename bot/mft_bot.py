@@ -3,9 +3,9 @@ from flask_sslify import SSLify
 from telebot import types, TeleBot
 
 import misc
-from bot.adapters import ResultsAdapter
 from api.model.media_type import MediaType
 from api.movie_db_service import MovieDbService
+from bot.adapters import ResultsAdapter
 from bot.callbacks import SearchCallback, RandomMovieCallback, MarkupButtonCallback
 from bot.utils import markup_util, inline_query_util, messages
 
@@ -15,7 +15,6 @@ sslify = SSLify(app)
 movie_db_service = MovieDbService()
 results_adapter = None
 cast_results_adapter = None
-img_results_adapter = None
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -93,7 +92,7 @@ def search_query(query):
         item_id = query_data[2]
         media_type = query_data[1]
 
-        if media_type == MediaType.TV_SHOW.value:
+        if MediaType.from_name(media_type) == MediaType.TV:
             videos = inline_query_util.generate_inline_videos_results(movie_db_service.get_tv_shows_videos(item_id))
         else:
             videos = inline_query_util.generate_inline_videos_results(movie_db_service.get_movie_videos(item_id))
@@ -102,52 +101,39 @@ def search_query(query):
             results=videos,
             cache_time=0
         )
-    # elif MarkupButtonsCallback.CAST.value in query.query:
-    #     query_data = query.query.split('-')
-    #     item_id = query_data[2]
-    #     media_type = query_data[1]
-    #     if media_type == MediaType.TV_SHOW.value:
-    #         cast_results = inline_query_util.generate_inline_search_results(movie_db_service.get_tv_credits(item_id))
-    #     else:
-    #         cast_results = inline_query_util.generate_inline_search_results(movie_db_service.get_movie_credits(item_id))
-    #
-    #     if offset == 1:
-    #         global cast_results_adapter
-    #         cast_results_adapter = ResultsAdapter(cast_results)
-    #         results = cast_results_adapter.next_chunk()
-    #     elif offset > 1:
-    #         results = cast_results_adapter.next_chunk()
 
-    # elif MarkupButtonsCallback.IMAGES.value in query.query:
-    #     images = movie_db_service.get_person_images(person_id=query.query.split('-')[1])
-    #     # if offset == 1:
-    #     #     person_images_results = movie_db_service.get_person_images(person_id=query.query.split('-')[1])
-    #     #     # global img_results_adapter
-    #     #     # img_results_adapter = ResultsAdapter(person_images_results)
-    #     #     # results = img_results_adapter.next_chunk()
-    #     # elif offset > 1:
-    #     #     results = img_results_adapter.next_chunk()
-    #
-    #     bot.answer_inline_query(
-    #         inline_query_id=query.id,
-    #         results=inline_query_util.generate_inline_images_results(images),
-    #         # next_offset=offset,
-    #         cache_time=0
-    #         # is_personal=True
-    #     )
+    elif MarkupButtonCallback.CAST.value in query.query:
+        query_data = query.query.split('-')
+        item_id = query_data[2]
+        media_type = query_data[1]
+
+        if MediaType.from_name(media_type) == MediaType.TV:
+            cast_results = inline_query_util.inline_search_results(movie_db_service.get_tv_credits(item_id), MediaType.PERSON)
+        else:
+            cast_results = inline_query_util.inline_search_results(movie_db_service.get_movie_credits(item_id), MediaType.PERSON)
+
+        if offset == 1:
+            global cast_results_adapter
+            cast_results_adapter = ResultsAdapter(cast_results)
+            results = cast_results_adapter.next_chunk()
+        elif offset > 1:
+            results = cast_results_adapter.next_chunk()
 
     elif MarkupButtonCallback.RECOMMENDATIONS.value in query.query:
         query_data = query.query.split('-')
         item_id = query_data[2]
         media_type = query_data[1]
-        if MediaType.TV_SHOW.value == media_type:
-            results = movie_db_service.get_tv_show_recommendations(tv_show_id=item_id, page=offset)
+
+        if MediaType.from_name(media_type) == MediaType.TV:
+            results = inline_query_util.inline_search_results(
+                movie_db_service.get_tv_show_recommendations(tv_show_id=item_id, page=offset), MediaType.TV)
         else:
-            results = movie_db_service.get_movie_recommendations(movie_id=item_id, page=offset)
+            results = inline_query_util.inline_search_results(
+                movie_db_service.get_movie_recommendations(movie_id=item_id, page=offset), MediaType.MOVIE)
 
     elif MarkupButtonCallback.KNOWN_FOR.value in query.query:
         if offset == 1:
-            cast_results = movie_db_service.get_combined_cast(person_id=query.query.split('-')[1])
+            cast_results = inline_query_util.inline_search_results(movie_db_service.get_combined_cast(person_id=query.query.split('-')[1]), None)
             global results_adapter
             results_adapter = ResultsAdapter(cast_results)
             results = results_adapter.next_chunk()
@@ -155,28 +141,28 @@ def search_query(query):
             results = results_adapter.next_chunk()
 
     elif SearchCallback.POPULAR_MOVIES.value == query.query:
-        results = movie_db_service.get_popular_movies(page=offset)
+        results = inline_query_util.inline_search_results(movie_db_service.get_popular_movies(page=offset), MediaType.MOVIE)
 
     elif SearchCallback.TV_ON_THE_AIR.value == query.query:
-        results = movie_db_service.get_tv_on_the_air(page=offset)
+        results = inline_query_util.inline_search_results(movie_db_service.get_tv_on_the_air(page=offset), MediaType.TV)
 
     elif SearchCallback.POPULAR_TV_SHOWS.value == query.query:
-        results = movie_db_service.get_popular_tv_shows(page=offset)
+        results = inline_query_util.inline_search_results(movie_db_service.get_popular_tv_shows(page=offset), MediaType.TV)
 
     elif SearchCallback.POPULAR_PEOPLE.value == query.query:
-        results = movie_db_service.get_popular_people(page=offset)
+        results = inline_query_util.inline_search_results(movie_db_service.get_popular_people(page=offset), MediaType.PERSON)
 
     elif SearchCallback.TOP_RATED_MOVIES.value == query.query:
-        results = movie_db_service.get_top_rated_movies(page=offset)
+        results = inline_query_util.inline_search_results(movie_db_service.get_top_rated_movies(page=offset), MediaType.MOVIE)
 
     elif SearchCallback.TOP_RATED_TV_SHOWS.value == query.query:
-        results = movie_db_service.get_top_rated_tv_shows(page=offset)
+        results = inline_query_util.inline_search_results(movie_db_service.get_top_rated_tv_shows(page=offset), MediaType.TV)
 
     elif SearchCallback.MOVIES_IN_THEATERS.value == query.query:
-        results = movie_db_service.get_movies_in_theatres(page=offset)
+        results = inline_query_util.inline_search_results(movie_db_service.get_movies_in_theatres(page=offset), MediaType.MOVIE)
 
     else:
-        results = movie_db_service.multi_search(query=query.query, page=offset)
+        results = inline_query_util.inline_search_results(movie_db_service.multi_search(query=query.query, page=offset), None)
 
     if results is None:
         results = []
@@ -184,7 +170,7 @@ def search_query(query):
     offset = offset + 1 if len(results) > 0 else ''
     bot.answer_inline_query(
         inline_query_id=query.id,
-        results=inline_query_util.generate_inline_search_results(results),
+        results=results,
         next_offset=offset,
         cache_time=0,
         is_personal=True

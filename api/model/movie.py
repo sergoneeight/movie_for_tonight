@@ -3,12 +3,13 @@ from datetime import datetime
 
 from api.model.genres import Genre
 from api.model.image import ImageConfig
+from api.model.media_type import MediaType
 from bot.config import MAX_TITLE_CHARS, MAX_DESCRIPTION_CHARS
 
 
 class Movie(object):
     BASE_MOVIE_URL = 'https://www.themoviedb.org/movie/'
-    POSTER_PLACEHOLDER = 'https://critics.io/img/movies/poster-placeholder.png'
+    POSTER_PLACEHOLDER = 'https://www.beddingwarehouse.com.au/wp-content/uploads/2016/01/placeholder-featured-image-600x600.png'
 
     def __init__(self, response_dict):
         self.id = response_dict['id']
@@ -21,6 +22,7 @@ class Movie(object):
         self._poster_path = response_dict['poster_path']
         self._backdrop_path = response_dict['backdrop_path']
         self._genre_ids = response_dict['genre_ids']
+        self.media_type = MediaType.MOVIE
         self.gold_star = u'\u2B50'
 
     @property
@@ -42,8 +44,8 @@ class Movie(object):
 
     @property
     def shorten_title(self):
-        return textwrap.shorten(self.title, MAX_TITLE_CHARS, placeholder=u'\u2026') + '({year})'.format(
-            year=self.release_date.year) if self.release_date else ''
+        return textwrap.shorten(self.title, MAX_TITLE_CHARS, placeholder=u'\u2026') + (' ({year})'.format(
+            year=self.release_date.year) if self.release_date else '')
 
     @property
     def vote_average(self):
@@ -53,12 +55,13 @@ class Movie(object):
 
     @property
     def release_date(self):
-        release_date = ''
+        date = ''
         try:
-            release_date = datetime.strptime(self._release_date, '%Y-%m-%d')
+            date = datetime.strptime(self._release_date, '%Y-%m-%d')
         except ValueError as e:
             print(e)
-        return release_date
+        finally:
+            return date
 
     @property
     def poster_url(self):

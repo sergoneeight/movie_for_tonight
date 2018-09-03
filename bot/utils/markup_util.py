@@ -10,7 +10,7 @@ def get_random_movie_markup(movie):
     retry_btn = InlineKeyboardButton(text=messages.RETRY_BTN_TEXT, callback_data=RandomMovieCallback.NEW_RANDOM_MOVIE.value)
     trailer_btn = InlineKeyboardButton(text=messages.VIDEOS_BTN_TEXT, switch_inline_query_current_chat='{callback}-{media_type}-{id}'.format(
         callback=MarkupButtonCallback.VIDEOS.value,
-        media_type=movie.media_type,
+        media_type=movie.media_type.value,
         id=movie.id,
     ))
     markup.row(details_btn, retry_btn)
@@ -23,7 +23,7 @@ def __recommendations_btn(search_item):
     query_data = '{callback}-{media_type}-{id}'.format(
         callback=MarkupButtonCallback.RECOMMENDATIONS.value,
         id=search_item.id,
-        media_type=search_item.media_type
+        media_type=search_item.media_type.value
     )
     return InlineKeyboardButton(
         text=messages.MORE_LIKE_THIS_BTN_TEXT,
@@ -96,16 +96,15 @@ def get_inline_general_search_result_markup(search_item):
     details_btn = InlineKeyboardButton(text=messages.DETAILS_BTN_TEXT, url=search_item.details_url)
     videos_btn = InlineKeyboardButton(text=messages.VIDEOS_BTN_TEXT, switch_inline_query_current_chat='{callback}-{media_type}-{id}'.format(
         callback=MarkupButtonCallback.VIDEOS.value,
-        media_type=search_item.media_type,
+        media_type=search_item.media_type.value,
         id=search_item.id
     ))
     cast_btn = InlineKeyboardButton(text=messages.CAST_BTN_TEXT, switch_inline_query_current_chat='{callback}-{media_type}-{id}'.format(
         callback=MarkupButtonCallback.CAST.value,
-        media_type=search_item.media_type,
+        media_type=search_item.media_type.value,
         id=search_item.id
     ))
     markup.row(details_btn)
-    markup.row(videos_btn)
+    markup.row(videos_btn, cast_btn)
     markup.row(__recommendations_btn(search_item))
-    # markup.row(cast_btn)
     return markup

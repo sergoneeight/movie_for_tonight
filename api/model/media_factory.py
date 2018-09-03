@@ -10,7 +10,7 @@ class MediaTypeFactory(object):
     def instance(response_dict, media_type=None):
         if media_type == MediaType.MOVIE:
             return Movie(response_dict)
-        elif media_type == MediaType.TV_SHOW:
+        elif media_type == MediaType.TV:
             return TVShow(response_dict)
         elif media_type == MediaType.PERSON:
             return Person(response_dict)
@@ -19,7 +19,7 @@ class MediaTypeFactory(object):
                 item_media_type = response_dict['media_type']
                 if item_media_type == MediaType.MOVIE.value:
                     return Movie(response_dict)
-                elif item_media_type == MediaType.TV_SHOW.value:
+                elif item_media_type == MediaType.TV.value:
                     return TVShow(response_dict)
                 elif item_media_type == MediaType.PERSON.value:
                     return Person(response_dict)

@@ -4,8 +4,7 @@ from api.model.media_type import MediaType
 
 class Person(object):
     BASE_PERSON_URL = 'https://www.themoviedb.org/person/'
-    # TODO change placeholder
-    POSTER_PLACEHOLDER = 'https://critics.io/img/movies/poster-placeholder.png'
+    POSTER_PLACEHOLDER = 'http://www.irdconline.com/wp-content/uploads/2018/05/person-placeholder.jpg'
 
     def __init__(self, response_dict):
         self.id = response_dict['id']
@@ -13,16 +12,19 @@ class Person(object):
         self._profile_path = response_dict['profile_path']
         self._known_for = response_dict['known_for'] if 'known_for' in response_dict else []
         self.character = response_dict['character'] if 'character' in response_dict else ''
+        self.media_type = MediaType.PERSON
 
     @property
     def description(self):
+        if self.character:
+            return self.character
         return self.known_for
 
     @property
     def caption(self):
         return '<b>{name}</b>\n{known_for}<a href="{url}">&#160</a>'.format(
             name=self.name,
-            known_for=self.known_for,
+            known_for=self.known_for if self.known_for else self.character,
             url=self.poster_url
         )
 

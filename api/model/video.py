@@ -13,7 +13,7 @@ class Video(object):
 
     @property
     def caption(self):
-        return '<a href="{url}">&#160</a>'.format(url=self.url)
+        return'<b>{title}</b><a href="{url}">&#160</a>'.format(title=self.name, url=self.url)
 
     @property
     def thumbnail(self):
