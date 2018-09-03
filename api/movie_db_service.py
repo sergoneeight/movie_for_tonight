@@ -5,7 +5,7 @@ import requests
 
 import misc
 from api.model.media_type import MediaType
-from api.model.response import PagedResponse, VideosResponse, PersonCreditsResponse
+from api.model.response import PagedResponse, VideosResponse, CreditsResponse, ProfileImagesResponse
 
 
 class MovieDbService(object):
@@ -123,7 +123,28 @@ class MovieDbService(object):
         endpoint = self.BASE_URL + 'person/{person_id}/combined_credits'.format(person_id=person_id)
         http_response = requests.get(endpoint, params=Payload())
         if http_response.status_code == 200:
-            return sorted(PersonCreditsResponse(http_response.json()).cast_media, key=lambda item: item.popularity, reverse=True)
+            return sorted(CreditsResponse(http_response.json()).cast, key=lambda item: item.popularity, reverse=True)
+        return None
+
+    def get_movie_credits(self, movie_id):
+        endpoint = self.BASE_URL + 'movie/{movie_id}/credits'.format(movie_id=movie_id)
+        http_response = requests.get(endpoint, params=Payload())
+        if http_response.status_code == 200:
+            return CreditsResponse(http_response.json(), MediaType.PERSON).cast
+        return None
+
+    def get_tv_credits(self, tv_id):
+        endpoint = self.BASE_URL + 'tv/{tv_id}/credits'.format(tv_id=tv_id)
+        http_response = requests.get(endpoint, params=Payload())
+        if http_response.status_code == 200:
+            return CreditsResponse(http_response.json(), MediaType.PERSON).cast
+        return None
+
+    def get_person_images(self, person_id):
+        endpoint = self.BASE_URL + 'person/{person_id}/images'.format(person_id=person_id)
+        http_response = requests.get(endpoint, params=Payload())
+        if http_response.status_code == 200:
+            return ProfileImagesResponse(http_response.json()).images
         return None
 
     def discover_tv_shows(self, search_filter):

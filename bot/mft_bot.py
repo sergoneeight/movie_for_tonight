@@ -3,10 +3,10 @@ from flask_sslify import SSLify
 from telebot import types, TeleBot
 
 import misc
-from api.adapters import ResultsAdapter
+from bot.adapters import ResultsAdapter
 from api.model.media_type import MediaType
 from api.movie_db_service import MovieDbService
-from bot.callbacks import SearchCallback, RandomMovieCallback, MarkupButtonsCallback
+from bot.callbacks import SearchCallback, RandomMovieCallback, MarkupButtonCallback
 from bot.utils import markup_util, inline_query_util, messages
 
 bot = TeleBot(misc.BOT_TOKEN, threaded=False)
@@ -14,6 +14,8 @@ app = flask.Flask(__name__)
 sslify = SSLify(app)
 movie_db_service = MovieDbService()
 results_adapter = None
+cast_results_adapter = None
+img_results_adapter = None
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -86,10 +88,11 @@ def search_query(query):
     if len(query.query) == 0:
         bot.answer_inline_query(query.id, [], cache_time=0)
 
-    if MarkupButtonsCallback.VIDEOS.value in query.query:
+    if MarkupButtonCallback.VIDEOS.value in query.query:
         query_data = query.query.split('-')
         item_id = query_data[2]
         media_type = query_data[1]
+
         if media_type == MediaType.TV_SHOW.value:
             videos = inline_query_util.generate_inline_videos_results(movie_db_service.get_tv_shows_videos(item_id))
         else:
@@ -99,8 +102,41 @@ def search_query(query):
             results=videos,
             cache_time=0
         )
+    # elif MarkupButtonsCallback.CAST.value in query.query:
+    #     query_data = query.query.split('-')
+    #     item_id = query_data[2]
+    #     media_type = query_data[1]
+    #     if media_type == MediaType.TV_SHOW.value:
+    #         cast_results = inline_query_util.generate_inline_search_results(movie_db_service.get_tv_credits(item_id))
+    #     else:
+    #         cast_results = inline_query_util.generate_inline_search_results(movie_db_service.get_movie_credits(item_id))
+    #
+    #     if offset == 1:
+    #         global cast_results_adapter
+    #         cast_results_adapter = ResultsAdapter(cast_results)
+    #         results = cast_results_adapter.next_chunk()
+    #     elif offset > 1:
+    #         results = cast_results_adapter.next_chunk()
 
-    elif MarkupButtonsCallback.MORE_LIKE_THIS.value in query.query:
+    # elif MarkupButtonsCallback.IMAGES.value in query.query:
+    #     images = movie_db_service.get_person_images(person_id=query.query.split('-')[1])
+    #     # if offset == 1:
+    #     #     person_images_results = movie_db_service.get_person_images(person_id=query.query.split('-')[1])
+    #     #     # global img_results_adapter
+    #     #     # img_results_adapter = ResultsAdapter(person_images_results)
+    #     #     # results = img_results_adapter.next_chunk()
+    #     # elif offset > 1:
+    #     #     results = img_results_adapter.next_chunk()
+    #
+    #     bot.answer_inline_query(
+    #         inline_query_id=query.id,
+    #         results=inline_query_util.generate_inline_images_results(images),
+    #         # next_offset=offset,
+    #         cache_time=0
+    #         # is_personal=True
+    #     )
+
+    elif MarkupButtonCallback.RECOMMENDATIONS.value in query.query:
         query_data = query.query.split('-')
         item_id = query_data[2]
         media_type = query_data[1]
@@ -109,7 +145,7 @@ def search_query(query):
         else:
             results = movie_db_service.get_movie_recommendations(movie_id=item_id, page=offset)
 
-    elif MarkupButtonsCallback.KNOWN_FOR.value in query.query:
+    elif MarkupButtonCallback.KNOWN_FOR.value in query.query:
         if offset == 1:
             cast_results = movie_db_service.get_combined_cast(person_id=query.query.split('-')[1])
             global results_adapter

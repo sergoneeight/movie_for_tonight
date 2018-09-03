@@ -17,7 +17,9 @@ class RandomMovieCallback(Enum):
     NEW_RANDOM_MOVIE = '_new_random_movie'
 
 
-class MarkupButtonsCallback(Enum):
-    MORE_LIKE_THIS = '_like'
+class MarkupButtonCallback(Enum):
+    RECOMMENDATIONS = '_rec'
     VIDEOS = '_vid'
+    CAST = '_cast'
     KNOWN_FOR = '_known_for'
+    IMAGES = '_img'

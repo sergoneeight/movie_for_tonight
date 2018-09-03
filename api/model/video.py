@@ -1,6 +1,3 @@
-from enum import Enum
-
-
 class Video(object):
     BASE_VIDEO_URL = 'https://www.youtube.com/embed/'
 
@@ -15,10 +12,9 @@ class Video(object):
         return self.BASE_VIDEO_URL + self.key
 
     @property
+    def caption(self):
+        return '<a href="{url}">&#160</a>'.format(url=self.url)
+
+    @property
     def thumbnail(self):
         return 'https://img.youtube.com/vi/{video_key}/hqdefault.jpg'.format(video_key=self.key)
-
-
-class VideoType(Enum):
-    CLIP = 'Clip'
-    TRAILER = 'Trailer'

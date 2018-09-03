@@ -1,4 +1,4 @@
-from telebot.types import InlineQueryResultArticle, InputTextMessageContent, InlineQueryResultVideo
+from telebot.types import InlineQueryResultArticle, InputTextMessageContent, InlineQueryResultVideo, InlineQueryResultPhoto
 
 from api.model.media_type import MediaType
 from bot.utils import markup_util
@@ -8,9 +8,6 @@ def generate_inline_search_results(search_results):
     results = []
     if search_results:
         for item_num, search_item in enumerate(search_results):
-            # TODO change harcoded results count
-            if item_num == 20:
-                break
             if search_item.media_type == MediaType.PERSON.value:
                 replay_markup = markup_util.get_person_inline_search_result_markup(search_item)
             else:
@@ -31,25 +28,54 @@ def generate_inline_search_results(search_results):
     return results
 
 
+def inline_search_results(search_results, media_type):
+    results = []
+    if search_results:
+        for item_num, search_item in enumerate(search_results):
+            if media_type == MediaType.PERSON:
+                replay_markup = markup_util.get_person_inline_search_result_markup(search_item)
+            else:
+                replay_markup = markup_util.get_inline_general_search_result_markup(search_item)
+
+            item = InlineQueryResultArticle(
+                id=item_num,
+                title=search_item.shorten_title,
+                description=search_item.description,
+                reply_markup=replay_markup,
+                input_message_content=InputTextMessageContent(
+                    message_text=search_item.caption,
+                    parse_mode='HTML'
+                ),
+                thumb_url=search_item.poster_url
+            )
+            results.append(item)
+    return results
+
+
 def generate_inline_videos_results(search_results):
     results = []
     for item_num, search_item in enumerate(search_results):
-        # item = InlineQueryResultVideo(id=item_num, video_url=search_item.url, title=search_item.name, mime_type='video/mp4',
-        #                               thumb_url=search_item.thumbnail,
-        #                               input_message_content=InputTextMessageContent(
-        #                                   message_text='<b>{title}</b><a href="{url}">&#160</a>'.format(title=search_item.name,
-        #                                                                                                 url=search_item.url),
-        #                                   parse_mode='HTML'
-        #                               ))
         item = InlineQueryResultArticle(
             id=item_num,
             title=search_item.name,
             description=search_item.type,
             input_message_content=InputTextMessageContent(
-                message_text='<b>{title}</b><a href="{url}">&#160</a>'.format(title=search_item.name, url=search_item.url),
+                message_text=search_item.caption,
                 parse_mode='HTML'
             ),
             thumb_url=search_item.thumbnail
+        )
+        results.append(item)
+    return results
+
+
+def generate_inline_images_results(images_results):
+    results = []
+    for item_num, image in enumerate(images_results):
+        item = InlineQueryResultPhoto(
+            id=item_num,
+            photo_url=image.url,
+            thumb_url=image.url
         )
         results.append(item)
     return results

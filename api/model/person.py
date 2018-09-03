@@ -1,4 +1,4 @@
-from api.model.image import Image
+from api.model.image import ImageConfig
 from api.model.media_type import MediaType
 
 
@@ -9,26 +9,26 @@ class Person(object):
 
     def __init__(self, response_dict):
         self.id = response_dict['id']
-        self.title = response_dict['name']
+        self.name = response_dict['name']
         self._profile_path = response_dict['profile_path']
-        self._known_for = response_dict['known_for']
-        self.media_type = MediaType.PERSON.value
+        self._known_for = response_dict['known_for'] if 'known_for' in response_dict else []
+        self.character = response_dict['character'] if 'character' in response_dict else ''
 
     @property
     def description(self):
         return self.known_for
 
     @property
-    def formatted_title(self):
-        return self.title
-
-    @property
     def caption(self):
         return '<b>{name}</b>\n{known_for}<a href="{url}">&#160</a>'.format(
-            name=self.title,
+            name=self.name,
             known_for=self.known_for,
             url=self.poster_url
         )
+
+    @property
+    def shorten_title(self):
+        return self.name
 
     @property
     def known_for(self):
@@ -41,5 +41,5 @@ class Person(object):
     @property
     def poster_url(self):
         if self._profile_path:
-            return Image.BASE_URL + Image.ProfileSize.LARGE.value + self._profile_path
+            return ImageConfig.BASE_URL + ImageConfig.ProfileSize.LARGE.value + self._profile_path
         return self.POSTER_PLACEHOLDER

@@ -23,7 +23,7 @@ INLINE_SEARCH_PROMPT = 'Click the button to start searching for a movie, tv show
 TV_ON_THE_AIR_PROMPT = 'Click the button to show tv shows that are currently on the air'
 
 # Markup buttons text
-MORE_LIKE_THIS_BTN_TEXT = u'MORE LIKE THIS'
+MORE_LIKE_THIS_BTN_TEXT = u'RECOMMENDATIONS'
 DETAILS_BTN_TEXT = u'DETAILS'
 RETRY_BTN_TEXT = u'RETRY'
 SEARCH_BTN_TEXT = u'SEARCH'
@@ -34,3 +34,5 @@ IN_THEATERS_BTN_TEXT = u'IN THEATERS'
 ON_TV_BUTTON_TEXT = u'ON TV'
 VIDEOS_BTN_TEXT = u'VIDEOS'
 KNOWN_FOR_BTN_TEXT = u'KNOWN FOR'
+IMAGES_BTN_TEXT = u'IMAGES'
+CAST_BTN_TEXT = u'CAST'

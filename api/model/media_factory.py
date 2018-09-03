@@ -23,3 +23,5 @@ class MediaTypeFactory(object):
                     return TVShow(response_dict)
                 elif item_media_type == MediaType.PERSON.value:
                     return Person(response_dict)
+                else:
+                    return None
