@@ -4,7 +4,7 @@ from api.model.media_type import MediaType
 
 class Person(object):
     BASE_PERSON_URL = 'https://www.themoviedb.org/person/'
-    POSTER_PLACEHOLDER = 'http://www.irdconline.com/wp-content/uploads/2018/05/person-placeholder.jpg'
+    POSTER_PLACEHOLDER = 'https://sergoneeight.pythonanywhere.com/public/person_placeholder.jpg'
 
     def __init__(self, response_dict):
         self.id = response_dict['id']

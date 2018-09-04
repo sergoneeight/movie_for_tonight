@@ -108,9 +108,9 @@ def search_query(query):
         media_type = query_data[1]
 
         if MediaType.from_name(media_type) == MediaType.TV:
-            cast_results = inline_query_util.inline_search_results(movie_db_service.get_tv_credits(item_id), MediaType.PERSON)
+            cast_results = inline_query_util.inline_search_results(movie_db_service.get_tv_credits(item_id))
         else:
-            cast_results = inline_query_util.inline_search_results(movie_db_service.get_movie_credits(item_id), MediaType.PERSON)
+            cast_results = inline_query_util.inline_search_results(movie_db_service.get_movie_credits(item_id))
 
         if offset == 1:
             global cast_results_adapter
@@ -126,14 +126,14 @@ def search_query(query):
 
         if MediaType.from_name(media_type) == MediaType.TV:
             results = inline_query_util.inline_search_results(
-                movie_db_service.get_tv_show_recommendations(tv_show_id=item_id, page=offset), MediaType.TV)
+                movie_db_service.get_tv_show_recommendations(tv_show_id=item_id, page=offset))
         else:
             results = inline_query_util.inline_search_results(
-                movie_db_service.get_movie_recommendations(movie_id=item_id, page=offset), MediaType.MOVIE)
+                movie_db_service.get_movie_recommendations(movie_id=item_id, page=offset))
 
-    elif MarkupButtonCallback.KNOWN_FOR.value in query.query:
+    elif MarkupButtonCallback.ACTING.value in query.query:
         if offset == 1:
-            cast_results = inline_query_util.inline_search_results(movie_db_service.get_combined_cast(person_id=query.query.split('-')[1]), None)
+            cast_results = inline_query_util.inline_search_results(movie_db_service.get_combined_cast(person_id=query.query.split('-')[1]))
             global results_adapter
             results_adapter = ResultsAdapter(cast_results)
             results = results_adapter.next_chunk()
@@ -141,28 +141,28 @@ def search_query(query):
             results = results_adapter.next_chunk()
 
     elif SearchCallback.POPULAR_MOVIES.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_popular_movies(page=offset), MediaType.MOVIE)
+        results = inline_query_util.inline_search_results(movie_db_service.get_popular_movies(page=offset))
 
     elif SearchCallback.TV_ON_THE_AIR.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_tv_on_the_air(page=offset), MediaType.TV)
+        results = inline_query_util.inline_search_results(movie_db_service.get_tv_on_the_air(page=offset))
 
     elif SearchCallback.POPULAR_TV_SHOWS.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_popular_tv_shows(page=offset), MediaType.TV)
+        results = inline_query_util.inline_search_results(movie_db_service.get_popular_tv_shows(page=offset))
 
     elif SearchCallback.POPULAR_PEOPLE.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_popular_people(page=offset), MediaType.PERSON)
+        results = inline_query_util.inline_search_results(movie_db_service.get_popular_people(page=offset))
 
     elif SearchCallback.TOP_RATED_MOVIES.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_top_rated_movies(page=offset), MediaType.MOVIE)
+        results = inline_query_util.inline_search_results(movie_db_service.get_top_rated_movies(page=offset))
 
     elif SearchCallback.TOP_RATED_TV_SHOWS.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_top_rated_tv_shows(page=offset), MediaType.TV)
+        results = inline_query_util.inline_search_results(movie_db_service.get_top_rated_tv_shows(page=offset))
 
     elif SearchCallback.MOVIES_IN_THEATERS.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_movies_in_theatres(page=offset), MediaType.MOVIE)
+        results = inline_query_util.inline_search_results(movie_db_service.get_movies_in_theatres(page=offset))
 
     else:
-        results = inline_query_util.inline_search_results(movie_db_service.multi_search(query=query.query, page=offset), None)
+        results = inline_query_util.inline_search_results(movie_db_service.multi_search(query=query.query, page=offset))
 
     if results is None:
         results = []

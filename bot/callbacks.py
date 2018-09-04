@@ -21,5 +21,5 @@ class MarkupButtonCallback(Enum):
     RECOMMENDATIONS = '_rec'
     VIDEOS = '_vid'
     CAST = '_cast'
-    KNOWN_FOR = '_known_for'
+    ACTING = '_acting'
     IMAGES = '_img'

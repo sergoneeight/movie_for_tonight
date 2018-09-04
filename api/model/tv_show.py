@@ -9,7 +9,7 @@ from bot.config import MAX_DESCRIPTION_CHARS, MAX_TITLE_CHARS
 
 class TVShow(object):
     BASE_TV_SHOW_URL = 'https://www.themoviedb.org/tv/'
-    POSTER_PLACEHOLDER = 'https://www.beddingwarehouse.com.au/wp-content/uploads/2016/01/placeholder-featured-image-600x600.png'
+    POSTER_PLACEHOLDER = 'https://sergoneeight.pythonanywhere.com/public/media_placeholder.jpg'
 
     def __init__(self, response_dict):
         self.id = response_dict['id']

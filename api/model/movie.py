@@ -9,7 +9,7 @@ from bot.config import MAX_TITLE_CHARS, MAX_DESCRIPTION_CHARS
 
 class Movie(object):
     BASE_MOVIE_URL = 'https://www.themoviedb.org/movie/'
-    POSTER_PLACEHOLDER = 'https://www.beddingwarehouse.com.au/wp-content/uploads/2016/01/placeholder-featured-image-600x600.png'
+    POSTER_PLACEHOLDER = 'https://sergoneeight.pythonanywhere.com/public/media_placeholder.jpg'
 
     def __init__(self, response_dict):
         self.id = response_dict['id']
