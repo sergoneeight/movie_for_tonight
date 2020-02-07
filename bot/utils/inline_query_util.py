@@ -8,13 +8,14 @@ def inline_search_results(search_results):
     results = []
     if search_results:
         for item_num, search_item in enumerate(search_results):
+
             if search_item.media_type == MediaType.PERSON:
                 replay_markup = markup_util.get_person_inline_search_result_markup(search_item)
             else:
                 replay_markup = markup_util.get_inline_general_search_result_markup(search_item)
 
             item = InlineQueryResultArticle(
-                id=item_num,
+                id=search_item.id,
                 title=search_item.shorten_title,
                 description=search_item.description,
                 reply_markup=replay_markup,

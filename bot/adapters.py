@@ -9,7 +9,6 @@ class ResultsAdapter(object):
         for index, item in enumerate(self._results):
             counter += 1
             chunk.append(item)
-            print(index)
             if counter == 19:
                 counter = 0
                 yield chunk

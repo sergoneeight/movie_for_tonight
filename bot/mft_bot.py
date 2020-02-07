@@ -3,18 +3,16 @@ from flask_sslify import SSLify
 from telebot import types, TeleBot
 
 import misc
-from api.model.media_type import MediaType
 from api.movie_db_service import MovieDbService
-from bot.adapters import ResultsAdapter
-from bot.callbacks import SearchCallback, RandomMovieCallback, MarkupButtonCallback
-from bot.utils import markup_util, inline_query_util, messages
+from bot.callbacks import SearchCallback, RandomMovieCallback
+from bot.utils import markup_util, messages
+from bot.utils.inline_results_provider import InlineResultsProvider
 
 bot = TeleBot(misc.BOT_TOKEN, threaded=False)
 app = flask.Flask(__name__)
 sslify = SSLify(app)
 movie_db_service = MovieDbService()
-results_adapter = None
-cast_results_adapter = None
+inline_results_provider = InlineResultsProvider(movie_db_service)
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -39,7 +37,8 @@ def go_to_inline_search(message):
     bot.send_message(
         chat_id=message.chat.id,
         text=messages.INLINE_SEARCH_PROMPT,
-        reply_markup=markup_util.get_single_button_markup(btn_text=messages.SEARCH_BTN_TEXT, callback=SearchCallback.SEARCH)
+        reply_markup=markup_util.get_single_button_markup(btn_text=messages.SEARCH_BTN_TEXT,
+                                                          callback=SearchCallback.SEARCH)
     )
 
 
@@ -48,7 +47,8 @@ def go_to_inline_in_theaters_results(message):
     bot.send_message(
         chat_id=message.chat.id,
         text=messages.IN_THEATERS_PROMPT,
-        reply_markup=markup_util.get_single_button_markup(btn_text=messages.IN_THEATERS_BTN_TEXT, callback=SearchCallback.MOVIES_IN_THEATERS)
+        reply_markup=markup_util.get_single_button_markup(btn_text=messages.IN_THEATERS_BTN_TEXT,
+                                                          callback=SearchCallback.MOVIES_IN_THEATERS)
     )
 
 
@@ -57,7 +57,8 @@ def go_to_inline_on_tv_results(message):
     bot.send_message(
         chat_id=message.chat.id,
         text=messages.TV_ON_THE_AIR_PROMPT,
-        reply_markup=markup_util.get_single_button_markup(btn_text=messages.ON_TV_BUTTON_TEXT, callback=SearchCallback.TV_ON_THE_AIR)
+        reply_markup=markup_util.get_single_button_markup(btn_text=messages.ON_TV_BUTTON_TEXT,
+                                                          callback=SearchCallback.TV_ON_THE_AIR)
     )
 
 
@@ -82,97 +83,13 @@ def go_to_inline_top_rated_results(message):
 @bot.inline_handler(func=lambda query: True)
 def search_query(query):
     offset = int(query.offset) if query.offset else 1
-    results = []
-
-    if len(query.query) == 0:
-        bot.answer_inline_query(query.id, [], cache_time=0)
-
-    if MarkupButtonCallback.VIDEOS.value in query.query:
-        query_data = query.query.split('-')
-        item_id = query_data[2]
-        media_type = query_data[1]
-
-        if MediaType.from_name(media_type) == MediaType.TV:
-            videos = inline_query_util.generate_inline_videos_results(movie_db_service.get_tv_shows_videos(item_id))
-        else:
-            videos = inline_query_util.generate_inline_videos_results(movie_db_service.get_movie_videos(item_id))
-        bot.answer_inline_query(
-            inline_query_id=query.id,
-            results=videos,
-            cache_time=0
-        )
-
-    elif MarkupButtonCallback.CAST.value in query.query:
-        query_data = query.query.split('-')
-        item_id = query_data[2]
-        media_type = query_data[1]
-
-        if MediaType.from_name(media_type) == MediaType.TV:
-            cast_results = inline_query_util.inline_search_results(movie_db_service.get_tv_credits(item_id))
-        else:
-            cast_results = inline_query_util.inline_search_results(movie_db_service.get_movie_credits(item_id))
-
-        if offset == 1:
-            global cast_results_adapter
-            cast_results_adapter = ResultsAdapter(cast_results)
-            results = cast_results_adapter.next_chunk()
-        elif offset > 1:
-            results = cast_results_adapter.next_chunk()
-
-    elif MarkupButtonCallback.RECOMMENDATIONS.value in query.query:
-        query_data = query.query.split('-')
-        item_id = query_data[2]
-        media_type = query_data[1]
-
-        if MediaType.from_name(media_type) == MediaType.TV:
-            results = inline_query_util.inline_search_results(
-                movie_db_service.get_tv_show_recommendations(tv_show_id=item_id, page=offset))
-        else:
-            results = inline_query_util.inline_search_results(
-                movie_db_service.get_movie_recommendations(movie_id=item_id, page=offset))
-
-    elif MarkupButtonCallback.ACTING.value in query.query:
-        if offset == 1:
-            cast_results = inline_query_util.inline_search_results(movie_db_service.get_combined_cast(person_id=query.query.split('-')[1]))
-            global results_adapter
-            results_adapter = ResultsAdapter(cast_results)
-            results = results_adapter.next_chunk()
-        elif offset > 1:
-            results = results_adapter.next_chunk()
-
-    elif SearchCallback.POPULAR_MOVIES.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_popular_movies(page=offset))
-
-    elif SearchCallback.TV_ON_THE_AIR.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_tv_on_the_air(page=offset))
-
-    elif SearchCallback.POPULAR_TV_SHOWS.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_popular_tv_shows(page=offset))
-
-    elif SearchCallback.POPULAR_PEOPLE.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_popular_people(page=offset))
-
-    elif SearchCallback.TOP_RATED_MOVIES.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_top_rated_movies(page=offset))
-
-    elif SearchCallback.TOP_RATED_TV_SHOWS.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_top_rated_tv_shows(page=offset))
-
-    elif SearchCallback.MOVIES_IN_THEATERS.value == query.query:
-        results = inline_query_util.inline_search_results(movie_db_service.get_movies_in_theatres(page=offset))
-
-    else:
-        results = inline_query_util.inline_search_results(movie_db_service.multi_search(query=query.query, page=offset))
-
-    if results is None:
-        results = []
-
+    results = inline_results_provider.get_search_results(query.query, offset)
     offset = offset + 1 if len(results) > 0 else ''
     bot.answer_inline_query(
         inline_query_id=query.id,
         results=results,
         next_offset=offset,
-        cache_time=0,
+        cache_time=1,
         is_personal=True
     )
 
